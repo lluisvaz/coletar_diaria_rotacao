@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { type ColetaGrupo1, type ColetaGrupo2 } from "@shared/schema";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -18,22 +24,26 @@ interface ColetasPorDia {
 export default function Dashboard() {
   const [diasSelecionado, setDiaSelecionado] = useState<string | null>(null);
 
-  const { data: grupo1Data, isLoading: isLoadingGrupo1 } = useQuery<ColetaGrupo1[]>({
+  const { data: grupo1Data, isLoading: isLoadingGrupo1 } = useQuery<
+    ColetaGrupo1[]
+  >({
     queryKey: ["/api/coleta/grupo1"],
   });
 
-  const { data: grupo2Data, isLoading: isLoadingGrupo2 } = useQuery<ColetaGrupo2[]>({
+  const { data: grupo2Data, isLoading: isLoadingGrupo2 } = useQuery<
+    ColetaGrupo2[]
+  >({
     queryKey: ["/api/coleta/grupo2"],
   });
 
   // Agrupar coletas por dia
   const coletasPorDia: ColetasPorDia[] = [];
-  
+
   if (grupo1Data || grupo2Data) {
     const diasMap = new Map<string, ColetasPorDia>();
 
     // Adicionar coletas do grupo 1
-    grupo1Data?.forEach(coleta => {
+    grupo1Data?.forEach((coleta) => {
       const dataKey = coleta.dataColeta;
       if (!diasMap.has(dataKey)) {
         diasMap.set(dataKey, {
@@ -49,7 +59,7 @@ export default function Dashboard() {
     });
 
     // Adicionar coletas do grupo 2
-    grupo2Data?.forEach(coleta => {
+    grupo2Data?.forEach((coleta) => {
       const dataKey = coleta.dataColeta;
       if (!diasMap.has(dataKey)) {
         diasMap.set(dataKey, {
@@ -65,14 +75,16 @@ export default function Dashboard() {
     });
 
     // Converter map para array e ordenar por data (mais recente primeiro)
-    coletasPorDia.push(...Array.from(diasMap.values()).sort((a, b) => {
-      return new Date(b.data).getTime() - new Date(a.data).getTime();
-    }));
+    coletasPorDia.push(
+      ...Array.from(diasMap.values()).sort((a, b) => {
+        return new Date(b.data).getTime() - new Date(a.data).getTime();
+      }),
+    );
   }
 
   // Se um dia foi selecionado, mostrar o dashboard desse dia
   if (diasSelecionado) {
-    const dadosDia = coletasPorDia.find(d => d.data === diasSelecionado);
+    const dadosDia = coletasPorDia.find((d) => d.data === diasSelecionado);
     if (dadosDia) {
       return (
         <DashboardDia
@@ -115,29 +127,45 @@ export default function Dashboard() {
                   <div className="flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-primary" />
                     <CardTitle className="text-lg">
-                      {format(parseISO(dia.data), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      {format(parseISO(dia.data), "dd 'de' MMMM 'de' yyyy", {
+                        locale: ptBR,
+                      })}
                     </CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Total de registros:</span>
-                      <span className="text-2xl font-semibold text-foreground">{dia.total}</span>
+                      <span className="text-sm text-muted-foreground">
+                        Total de registros:
+                      </span>
+                      <span className="text-2xl font-semibold text-foreground">
+                        {dia.total}
+                      </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 pt-2 border-t">
                       <div>
-                        <p className="text-xs text-muted-foreground">Grupo 1</p>
-                        <p className="text-lg font-medium">{dia.grupo1.length}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Absorventes e Fraldas Tape
+                        </p>
+                        <p className="text-lg font-medium">
+                          {dia.grupo1.length}
+                        </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {dia.grupo1.map(c => c.linhaProducao).join(", ") || "—"}
+                          {dia.grupo1.map((c) => c.linhaProducao).join(", ") ||
+                            "—"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Grupo 2</p>
-                        <p className="text-lg font-medium">{dia.grupo2.length}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Fraldas Pants
+                        </p>
+                        <p className="text-lg font-medium">
+                          {dia.grupo2.length}
+                        </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {dia.grupo2.map(c => c.linhaProducao).join(", ") || "—"}
+                          {dia.grupo2.map((c) => c.linhaProducao).join(", ") ||
+                            "—"}
                         </p>
                       </div>
                     </div>
@@ -150,7 +178,9 @@ export default function Dashboard() {
           <div className="text-center py-12 text-muted-foreground">
             <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>Nenhuma coleta registrada</p>
-            <p className="text-sm mt-2">Use a aba "Entrada de Dados" para adicionar novas coletas</p>
+            <p className="text-sm mt-2">
+              Use a aba "Entrada de Dados" para adicionar novas coletas
+            </p>
           </div>
         )}
       </CardContent>

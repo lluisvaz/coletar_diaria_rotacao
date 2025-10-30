@@ -1,9 +1,25 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
@@ -12,8 +28,18 @@ import { cn } from "@/lib/utils";
 import FormularioGrupo1 from "./FormularioGrupo1";
 import FormularioGrupo2 from "./FormularioGrupo2";
 
-const LINHAS_GRUPO1 = ["L.90", "L.91", "L.92", "L.93", "L.94", "L.80", "L.81", "L.82", "L.83"];
-const LINHAS_GRUPO2 = ["L.84", "L.85"];
+const LINHAS_GRUPO1 = [
+  "L90",
+  "L91",
+  "L92",
+  "L93",
+  "L94",
+  "L80",
+  "L81",
+  "L82",
+  "L83",
+];
+const LINHAS_GRUPO2 = ["L84", "L85"];
 const TODAS_LINHAS = [...LINHAS_GRUPO1, ...LINHAS_GRUPO2];
 
 export default function FormularioDeEntrada() {
@@ -42,7 +68,7 @@ export default function FormularioDeEntrada() {
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !dataColeta && "text-muted-foreground"
+                    !dataColeta && "text-muted-foreground",
                   )}
                   data-testid="button-data-coleta"
                 >
@@ -70,12 +96,19 @@ export default function FormularioDeEntrada() {
           <div className="space-y-2">
             <Label htmlFor="linha-producao">Linha de Produção</Label>
             <Select value={linhaProducao} onValueChange={setLinhaProducao}>
-              <SelectTrigger id="linha-producao" data-testid="select-linha-producao">
+              <SelectTrigger
+                id="linha-producao"
+                data-testid="select-linha-producao"
+              >
                 <SelectValue placeholder="Selecione a linha" />
               </SelectTrigger>
               <SelectContent>
                 {TODAS_LINHAS.map((linha) => (
-                  <SelectItem key={linha} value={linha} data-testid={`option-linha-${linha}`}>
+                  <SelectItem
+                    key={linha}
+                    value={linha}
+                    data-testid={`option-linha-${linha}`}
+                  >
                     {linha}
                   </SelectItem>
                 ))}
