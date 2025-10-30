@@ -10,8 +10,8 @@ export interface IStorage {
   getColetasGrupo2(): Promise<ColetaGrupo2[]>;
   getColetaGrupo1(id: number): Promise<ColetaGrupo1 | undefined>;
   getColetaGrupo2(id: number): Promise<ColetaGrupo2 | undefined>;
-  createColetaGrupo1(coleta: InsertColetaGrupo1): Promise<ColetaGrupo1>;
-  createColetaGrupo2(coleta: InsertColetaGrupo2): Promise<ColetaGrupo2>;
+  createColetaGrupo1(coleta: InsertColetaGrupo1): Promise<ColetaGrupo1 | null>;
+  createColetaGrupo2(coleta: InsertColetaGrupo2): Promise<ColetaGrupo2 | null>;
   updateColetaGrupo1(id: number, coleta: Partial<InsertColetaGrupo1>): Promise<ColetaGrupo1 | undefined>;
   updateColetaGrupo2(id: number, coleta: Partial<InsertColetaGrupo2>): Promise<ColetaGrupo2 | undefined>;
   deleteColetaGrupo1(id: number): Promise<boolean>;
@@ -55,7 +55,16 @@ export class MemStorage implements IStorage {
     return this.coletasGrupo2.get(id);
   }
 
-  async createColetaGrupo1(insertColeta: InsertColetaGrupo1): Promise<ColetaGrupo1> {
+  async createColetaGrupo1(insertColeta: InsertColetaGrupo1): Promise<ColetaGrupo1 | null> {
+    // Verificação atômica de duplicata
+    const duplicata = Array.from(this.coletasGrupo1.values()).find(
+      c => c.dataColeta === insertColeta.dataColeta && c.linhaProducao === insertColeta.linhaProducao
+    );
+    
+    if (duplicata) {
+      return null; // Já existe registro para essa linha nessa data
+    }
+    
     const id = this.nextIdGrupo1++;
     const coleta: ColetaGrupo1 = {
       ...insertColeta,
@@ -68,7 +77,16 @@ export class MemStorage implements IStorage {
     return coleta;
   }
 
-  async createColetaGrupo2(insertColeta: InsertColetaGrupo2): Promise<ColetaGrupo2> {
+  async createColetaGrupo2(insertColeta: InsertColetaGrupo2): Promise<ColetaGrupo2 | null> {
+    // Verificação atômica de duplicata
+    const duplicata = Array.from(this.coletasGrupo2.values()).find(
+      c => c.dataColeta === insertColeta.dataColeta && c.linhaProducao === insertColeta.linhaProducao
+    );
+    
+    if (duplicata) {
+      return null; // Já existe registro para essa linha nessa data
+    }
+    
     const id = this.nextIdGrupo2++;
     const coleta: ColetaGrupo2 = {
       ...insertColeta,

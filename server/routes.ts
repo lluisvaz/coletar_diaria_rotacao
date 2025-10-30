@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertColetaGrupo1Schema, insertColetaGrupo2Schema } from "@shared/schema";
 import { z } from "zod";
+import { formatInTimeZone } from "date-fns-tz";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/coleta/grupo1 - Retorna todas as coletas do Grupo 1
@@ -31,7 +32,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/coleta/grupo1", async (req, res) => {
     try {
       const validatedData = insertColetaGrupo1Schema.parse(req.body);
+      
+      // Validar se a data é hoje (usar fuso horário de São Paulo)
+      const hoje = formatInTimeZone(new Date(), "America/Sao_Paulo", "yyyy-MM-dd");
+      if (validatedData.dataColeta !== hoje) {
+        res.status(400).json({ 
+          error: "Só é permitido registrar dados do dia atual" 
+        });
+        return;
+      }
+      
+      // Tentar criar a coleta com verificação atômica de duplicata
       const coleta = await storage.createColetaGrupo1(validatedData);
+      
+      if (!coleta) {
+        res.status(409).json({ 
+          error: `A linha ${validatedData.linhaProducao} já possui registro para o dia ${new Date(validatedData.dataColeta).toLocaleDateString('pt-BR')}.` 
+        });
+        return;
+      }
+      
       res.status(201).json(coleta);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -50,7 +70,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/coleta/grupo2", async (req, res) => {
     try {
       const validatedData = insertColetaGrupo2Schema.parse(req.body);
+      
+      // Validar se a data é hoje (usar fuso horário de São Paulo)
+      const hoje = formatInTimeZone(new Date(), "America/Sao_Paulo", "yyyy-MM-dd");
+      if (validatedData.dataColeta !== hoje) {
+        res.status(400).json({ 
+          error: "Só é permitido registrar dados do dia atual" 
+        });
+        return;
+      }
+      
+      // Tentar criar a coleta com verificação atômica de duplicata
       const coleta = await storage.createColetaGrupo2(validatedData);
+      
+      if (!coleta) {
+        res.status(409).json({ 
+          error: `A linha ${validatedData.linhaProducao} já possui registro para o dia ${new Date(validatedData.dataColeta).toLocaleDateString('pt-BR')}.` 
+        });
+        return;
+      }
+      
       res.status(201).json(coleta);
     } catch (error) {
       if (error instanceof z.ZodError) {

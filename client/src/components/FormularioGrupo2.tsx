@@ -6,6 +6,7 @@ import {
   type InsertColetaGrupo2,
   type ColetaGrupo2,
 } from "@shared/schema";
+import { formatInTimeZone } from "date-fns-tz";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -138,7 +139,7 @@ export default function FormularioGrupo2({
   });
 
   const onSubmit = (data: InsertColetaGrupo2) => {
-    const hoje = new Date().toISOString().split('T')[0];
+    const hoje = formatInTimeZone(new Date(), "America/Sao_Paulo", "yyyy-MM-dd");
     if (dataColeta !== hoje) {
       toast({
         title: "Data inválida",
