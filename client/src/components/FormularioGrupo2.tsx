@@ -1,9 +1,19 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { insertColetaGrupo2Schema, type InsertColetaGrupo2 } from "@shared/schema";
+import {
+  insertColetaGrupo2Schema,
+  type InsertColetaGrupo2,
+} from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -36,7 +46,10 @@ const CAMPOS_GRUPO2 = [
   { name: "matFix", label: "Mat Fix" },
 ] as const;
 
-export default function FormularioGrupo2({ dataColeta, linhaProducao }: FormularioGrupo2Props) {
+export default function FormularioGrupo2({
+  dataColeta,
+  linhaProducao,
+}: FormularioGrupo2Props) {
   const { toast } = useToast();
 
   const form = useForm<InsertColetaGrupo2>({
@@ -117,7 +130,7 @@ export default function FormularioGrupo2({ dataColeta, linhaProducao }: Formular
   return (
     <div>
       <h3 className="text-xl font-medium mb-4">
-        Formulário Grupo 2 - {linhaProducao}
+        Preencha corretamente os dados da {linhaProducao}
       </h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -140,7 +153,9 @@ export default function FormularioGrupo2({ dataColeta, linhaProducao }: Formular
                         className="text-right font-mono"
                         data-testid={`input-${campo.name}`}
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value) || 0)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
