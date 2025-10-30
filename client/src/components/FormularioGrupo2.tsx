@@ -21,34 +21,38 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 interface FormularioGrupo2Props {
   dataColeta: string;
   linhaProducao: string;
+  onSalvarSucesso?: () => void;
 }
 
 const CAMPOS_GRUPO2 = [
-  { name: "velocidadeLinha", label: "Velocidade da Linha" },
-  { name: "waistPacker", label: "Waist Packer" },
-  { name: "isgElastic", label: "ISG Elastic" },
-  { name: "waistElastic", label: "Waist Elastic" },
-  { name: "isgSideSeal", label: "ISG Side Seal" },
-  { name: "absorventFix", label: "Absorvent Fix" },
-  { name: "outerEdge", label: "Outer Edge" },
-  { name: "inner", label: "Inner" },
-  { name: "bead", label: "Bead" },
-  { name: "standingGather", label: "Standing Gather" },
-  { name: "backflimFix", label: "Backflim Fix" },
-  { name: "osgSideSeal", label: "OSG Side Seal" },
-  { name: "osgElastico", label: "OSG Elástico" },
-  { name: "nwSealContLateral", label: "NW Seal Cont (Lateral)" },
-  { name: "nwSealIntCentRal", label: "NW Seal Int Cent (RAL)" },
-  { name: "outSideBackFlm", label: "Out Side Back FLM" },
-  { name: "topsheetFix", label: "Topsheet Fix" },
-  { name: "coreWrap", label: "Core Wrap" },
-  { name: "coreWrapSeal", label: "Core Wrap Seal" },
-  { name: "matFix", label: "Mat Fix" },
+  { name: "sku", label: "SKU", type: "text" },
+  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number" },
+  { name: "velocidadeLinha", label: "Velocidade da Linha", type: "number" },
+  { name: "waistPacker", label: "Waist Packer", type: "number" },
+  { name: "isgElastic", label: "ISG Elastic", type: "number" },
+  { name: "waistElastic", label: "Waist Elastic", type: "number" },
+  { name: "isgSideSeal", label: "ISG Side Seal", type: "number" },
+  { name: "absorventFix", label: "Absorvent Fix", type: "number" },
+  { name: "outerEdge", label: "Outer Edge", type: "number" },
+  { name: "inner", label: "Inner", type: "number" },
+  { name: "bead", label: "Bead", type: "number" },
+  { name: "standingGather", label: "Standing Gather", type: "number" },
+  { name: "backflimFix", label: "Backflim Fix", type: "number" },
+  { name: "osgSideSeal", label: "OSG Side Seal", type: "number" },
+  { name: "osgElastico", label: "OSG Elástico", type: "number" },
+  { name: "nwSealContLateral", label: "NW Seal Cont (Lateral)", type: "number" },
+  { name: "nwSealIntCentRal", label: "NW Seal Int Cent (RAL)", type: "number" },
+  { name: "outSideBackFlm", label: "Out Side Back FLM", type: "number" },
+  { name: "topsheetFix", label: "Topsheet Fix", type: "number" },
+  { name: "coreWrap", label: "Core Wrap", type: "number" },
+  { name: "coreWrapSeal", label: "Core Wrap Seal", type: "number" },
+  { name: "matFix", label: "Mat Fix", type: "number" },
 ] as const;
 
 export default function FormularioGrupo2({
   dataColeta,
   linhaProducao,
+  onSalvarSucesso,
 }: FormularioGrupo2Props) {
   const { toast } = useToast();
 
@@ -57,6 +61,8 @@ export default function FormularioGrupo2({
     defaultValues: {
       dataColeta,
       linhaProducao,
+      sku: '',
+      pesoSacolaVarpe: 0,
       velocidadeLinha: 0,
       waistPacker: 0,
       isgElastic: 0,
@@ -91,6 +97,8 @@ export default function FormularioGrupo2({
       form.reset({
         dataColeta,
         linhaProducao,
+        sku: '',
+        pesoSacolaVarpe: 0,
         velocidadeLinha: 0,
         waistPacker: 0,
         isgElastic: 0,
@@ -113,6 +121,7 @@ export default function FormularioGrupo2({
         matFix: 0,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo2"] });
+      onSalvarSucesso?.();
     },
     onError: () => {
       toast({
@@ -142,19 +151,21 @@ export default function FormularioGrupo2({
                 name={campo.name as any}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">
+                    <FormLabel className="text-xs font-medium">
                       {campo.label}
                     </FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        className="text-right font-mono"
+                        type={campo.type || "number"}
+                        step={campo.type === "number" ? "0.01" : undefined}
+                        placeholder={campo.type === "text" ? "" : "0.00"}
+                        className="text-center font-mono h-8 text-sm"
                         data-testid={`input-${campo.name}`}
                         {...field}
                         onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value) || 0)
+                          campo.type === "text" 
+                            ? field.onChange(e.target.value)
+                            : field.onChange(parseFloat(e.target.value) || 0)
                         }
                       />
                     </FormControl>

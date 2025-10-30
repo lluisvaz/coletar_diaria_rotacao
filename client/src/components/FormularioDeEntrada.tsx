@@ -45,6 +45,7 @@ const TODAS_LINHAS = [...LINHAS_GRUPO1, ...LINHAS_GRUPO2];
 export default function FormularioDeEntrada() {
   const [dataColeta, setDataColeta] = useState<Date>(new Date());
   const [linhaProducao, setLinhaProducao] = useState<string>("");
+  const [mostrarFormulario, setMostrarFormulario] = useState<boolean>(true);
 
   const isGrupo1 = LINHAS_GRUPO1.includes(linhaProducao);
   const isGrupo2 = LINHAS_GRUPO2.includes(linhaProducao);
@@ -119,17 +120,32 @@ export default function FormularioDeEntrada() {
 
         {linhaProducao && (
           <div className="mt-6 pt-6 border-t">
-            {isGrupo1 && (
-              <FormularioGrupo1
-                dataColeta={format(dataColeta, "yyyy-MM-dd")}
-                linhaProducao={linhaProducao}
-              />
+            {!mostrarFormulario && (
+              <Button
+                onClick={() => setMostrarFormulario(true)}
+                variant="outline"
+                className="w-full"
+              >
+                Adicionar Nova Coleta
+              </Button>
             )}
-            {isGrupo2 && (
-              <FormularioGrupo2
-                dataColeta={format(dataColeta, "yyyy-MM-dd")}
-                linhaProducao={linhaProducao}
-              />
+            {mostrarFormulario && (
+              <>
+                {isGrupo1 && (
+                  <FormularioGrupo1
+                    dataColeta={format(dataColeta, "yyyy-MM-dd")}
+                    linhaProducao={linhaProducao}
+                    onSalvarSucesso={() => setMostrarFormulario(false)}
+                  />
+                )}
+                {isGrupo2 && (
+                  <FormularioGrupo2
+                    dataColeta={format(dataColeta, "yyyy-MM-dd")}
+                    linhaProducao={linhaProducao}
+                    onSalvarSucesso={() => setMostrarFormulario(false)}
+                  />
+                )}
+              </>
             )}
           </div>
         )}

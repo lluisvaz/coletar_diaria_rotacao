@@ -59,6 +59,8 @@ export class MemStorage implements IStorage {
     const id = this.nextIdGrupo1++;
     const coleta: ColetaGrupo1 = {
       ...insertColeta,
+      sku: insertColeta.sku || '',
+      pesoSacolaVarpe: insertColeta.pesoSacolaVarpe || 0,
       id,
       createdAt: new Date().toISOString(),
     };
@@ -70,6 +72,8 @@ export class MemStorage implements IStorage {
     const id = this.nextIdGrupo2++;
     const coleta: ColetaGrupo2 = {
       ...insertColeta,
+      sku: insertColeta.sku || '',
+      pesoSacolaVarpe: insertColeta.pesoSacolaVarpe || 0,
       id,
       createdAt: new Date().toISOString(),
     };

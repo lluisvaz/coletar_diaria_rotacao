@@ -1,9 +1,19 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { insertColetaGrupo1Schema, type InsertColetaGrupo1 } from "@shared/schema";
+import {
+  insertColetaGrupo1Schema,
+  type InsertColetaGrupo1,
+} from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -11,30 +21,37 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 interface FormularioGrupo1Props {
   dataColeta: string;
   linhaProducao: string;
+  onSalvarSucesso?: () => void;
 }
 
 const CAMPOS_GRUPO1 = [
-  { name: "velocidadeLinha", label: "Velocidade da Linha" },
-  { name: "coreAttach", label: "Core Attach" },
-  { name: "coreWrap", label: "Core Wrap" },
-  { name: "surge", label: "Surge" },
-  { name: "cuffEnd", label: "Cuff End" },
-  { name: "bead", label: "Bead" },
-  { name: "legElastic", label: "Leg Elastic" },
-  { name: "cuffElastic", label: "Cuff Elastic" },
-  { name: "temporary", label: "Temporary" },
-  { name: "topsheet", label: "Topsheet (Non Woven)" },
-  { name: "backsheet", label: "Backsheet (Poly)" },
-  { name: "frontal", label: "Frontal" },
-  { name: "earAttach", label: "Ear Attach" },
-  { name: "pulpFix", label: "Pulp Fix" },
-  { name: "central", label: "Central" },
-  { name: "release", label: "Release" },
-  { name: "tapeOnBag", label: "Tape on Bag" },
-  { name: "filme1x1", label: "Filme 1x1" },
+  { name: "sku", label: "SKU", type: "text" },
+  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number" },
+  { name: "velocidadeLinha", label: "Velocidade da Linha", type: "number" },
+  { name: "coreAttach", label: "Core Attach", type: "number" },
+  { name: "coreWrap", label: "Core Wrap", type: "number" },
+  { name: "surge", label: "Surge", type: "number" },
+  { name: "cuffEnd", label: "Cuff End", type: "number" },
+  { name: "bead", label: "Bead", type: "number" },
+  { name: "legElastic", label: "Leg Elastic", type: "number" },
+  { name: "cuffElastic", label: "Cuff Elastic", type: "number" },
+  { name: "temporary", label: "Temporary", type: "number" },
+  { name: "topsheet", label: "Topsheet (Non Woven)", type: "number" },
+  { name: "backsheet", label: "Backsheet (Poly)", type: "number" },
+  { name: "frontal", label: "Frontal", type: "number" },
+  { name: "earAttach", label: "Ear Attach", type: "number" },
+  { name: "pulpFix", label: "Pulp Fix", type: "number" },
+  { name: "central", label: "Central", type: "number" },
+  { name: "release", label: "Release", type: "number" },
+  { name: "tapeOnBag", label: "Tape on Bag", type: "number" },
+  { name: "filme1x1", label: "Filme 1x1", type: "number" },
 ] as const;
 
-export default function FormularioGrupo1({ dataColeta, linhaProducao }: FormularioGrupo1Props) {
+export default function FormularioGrupo1({
+  dataColeta,
+  linhaProducao,
+  onSalvarSucesso,
+}: FormularioGrupo1Props) {
   const { toast } = useToast();
 
   const form = useForm<InsertColetaGrupo1>({
@@ -42,6 +59,8 @@ export default function FormularioGrupo1({ dataColeta, linhaProducao }: Formular
     defaultValues: {
       dataColeta,
       linhaProducao,
+      sku: '',
+      pesoSacolaVarpe: 0,
       velocidadeLinha: 0,
       coreAttach: 0,
       coreWrap: 0,
@@ -74,6 +93,8 @@ export default function FormularioGrupo1({ dataColeta, linhaProducao }: Formular
       form.reset({
         dataColeta,
         linhaProducao,
+        sku: '',
+        pesoSacolaVarpe: 0,
         velocidadeLinha: 0,
         coreAttach: 0,
         coreWrap: 0,
@@ -94,6 +115,7 @@ export default function FormularioGrupo1({ dataColeta, linhaProducao }: Formular
         filme1x1: 0,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
+      onSalvarSucesso?.();
     },
     onError: () => {
       toast({
@@ -111,7 +133,7 @@ export default function FormularioGrupo1({ dataColeta, linhaProducao }: Formular
   return (
     <div>
       <h3 className="text-xl font-medium mb-4">
-        Formulário Grupo 1 - {linhaProducao}
+        Preencha corretamente os dados da {linhaProducao}
       </h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -123,18 +145,22 @@ export default function FormularioGrupo1({ dataColeta, linhaProducao }: Formular
                 name={campo.name as any}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">
+                    <FormLabel className="text-xs font-medium">
                       {campo.label}
                     </FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        className="text-right font-mono"
+                        type={campo.type || "number"}
+                        step={campo.type === "number" ? "0.01" : undefined}
+                        placeholder={campo.type === "text" ? "" : "0.00"}
+                        className="text-center font-mono h-8 text-sm"
                         data-testid={`input-${campo.name}`}
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          campo.type === "text" 
+                            ? field.onChange(e.target.value)
+                            : field.onChange(parseFloat(e.target.value) || 0)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
