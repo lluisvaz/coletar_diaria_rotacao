@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -7,12 +7,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { type ColetaGrupo1, type ColetaGrupo2 } from "@shared/schema";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isWithinInterval, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
-import { Calendar } from "lucide-react";
+import { Calendar, Trash2, Filter } from "lucide-react";
 import DashboardDia from "./DashboardDia";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 
 interface ColetasPorDia {
   data: string;
@@ -23,6 +35,9 @@ interface ColetasPorDia {
 
 export default function Dashboard() {
   const [diasSelecionado, setDiaSelecionado] = useState<string | null>(null);
+  const [filtro, setFiltro] = useState<"todos" | "semana" | "mes" | "dia">("todos");
+  const [diaEspecifico, setDiaEspecifico] = useState<Date | undefined>(undefined);
+  const { toast } = useToast();
 
   const { data: grupo1Data, isLoading: isLoadingGrupo1 } = useQuery<
     ColetaGrupo1[]
@@ -35,6 +50,34 @@ export default function Dashboard() {
   >({
     queryKey: ["/api/coleta/grupo2"],
   });
+
+  const deleteDiaMutation = useMutation({
+    mutationFn: async (data: string) => {
+      const coletasDia = coletasPorDia.find((d) => d.data === data);
+      if (!coletasDia) return;
+
+      const promises = [
+        ...coletasDia.grupo1.map((c) => apiRequest("DELETE", `/api/coleta/grupo1/${c.id}`)),
+        ...coletasDia.grupo2.map((c) => apiRequest("DELETE", `/api/coleta/grupo2/${c.id}`)),
+      ];
+
+      await Promise.all(promises);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo2"] });
+      toast({ title: "Sucesso!", description: "Todos os registros do dia foram excluídos." });
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao excluir registros.", variant: "destructive" });
+    },
+  });
+
+  const excluirDia = (data: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (!confirm(`Tem certeza que deseja excluir TODOS os registros do dia ${format(parseISO(data), "dd/MM/yyyy", { locale: ptBR })}?`)) return;
+    deleteDiaMutation.mutate(data);
+  };
 
   // Agrupar coletas por dia
   const coletasPorDia: ColetasPorDia[] = [];
@@ -75,11 +118,31 @@ export default function Dashboard() {
     });
 
     // Converter map para array e ordenar por data (mais recente primeiro)
-    coletasPorDia.push(
-      ...Array.from(diasMap.values()).sort((a, b) => {
-        return new Date(b.data).getTime() - new Date(a.data).getTime();
-      }),
-    );
+    let allDias = Array.from(diasMap.values()).sort((a, b) => {
+      return new Date(b.data).getTime() - new Date(a.data).getTime();
+    });
+
+    // Aplicar filtros
+    if (filtro === "semana") {
+      const hoje = new Date();
+      const inicioSemana = startOfWeek(hoje, { locale: ptBR });
+      const fimSemana = endOfWeek(hoje, { locale: ptBR });
+      allDias = allDias.filter((dia) =>
+        isWithinInterval(parseISO(dia.data), { start: inicioSemana, end: fimSemana })
+      );
+    } else if (filtro === "mes") {
+      const hoje = new Date();
+      const inicioMes = startOfMonth(hoje);
+      const fimMes = endOfMonth(hoje);
+      allDias = allDias.filter((dia) =>
+        isWithinInterval(parseISO(dia.data), { start: inicioMes, end: fimMes })
+      );
+    } else if (filtro === "dia" && diaEspecifico) {
+      const diaFormatado = format(diaEspecifico, "yyyy-MM-dd");
+      allDias = allDias.filter((dia) => dia.data === diaFormatado);
+    }
+
+    coletasPorDia.push(...allDias);
   }
 
   // Se um dia foi selecionado, mostrar o dashboard desse dia
@@ -102,10 +165,45 @@ export default function Dashboard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Dashboard de Coletas</CardTitle>
-        <CardDescription>
-          Selecione um dia para visualizar e exportar os dados
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Dashboard de Coletas</CardTitle>
+            <CardDescription>
+              Selecione um dia para visualizar e exportar os dados
+            </CardDescription>
+          </div>
+          <div className="flex gap-2 items-center">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <Select value={filtro} onValueChange={(value: any) => setFiltro(value)}>
+              <SelectTrigger className="w-[180px]" data-testid="select-filtro">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="semana">Esta Semana</SelectItem>
+                <SelectItem value="mes">Este Mês</SelectItem>
+                <SelectItem value="dia">Dia Específico</SelectItem>
+              </SelectContent>
+            </Select>
+            {filtro === "dia" && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    {diaEspecifico ? format(diaEspecifico, "dd/MM/yyyy") : "Selecionar"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <CalendarComponent
+                    mode="single"
+                    selected={diaEspecifico}
+                    onSelect={setDiaEspecifico}
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -124,13 +222,24 @@ export default function Dashboard() {
                 data-testid={`card-dia-${dia.data}`}
               >
                 <CardHeader className="pb-3">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-lg">
-                      {format(parseISO(dia.data), "dd 'de' MMMM 'de' yyyy", {
-                        locale: ptBR,
-                      })}
-                    </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5 text-primary" />
+                      <CardTitle className="text-lg">
+                        {format(parseISO(dia.data), "dd 'de' MMMM 'de' yyyy", {
+                          locale: ptBR,
+                        })}
+                      </CardTitle>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      onClick={(e) => excluirDia(dia.data, e)}
+                      data-testid={`button-delete-dia-${dia.data}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent>

@@ -1,9 +1,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   insertColetaGrupo2Schema,
   type InsertColetaGrupo2,
+  type ColetaGrupo2,
 } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,6 +56,10 @@ export default function FormularioGrupo2({
   onSalvarSucesso,
 }: FormularioGrupo2Props) {
   const { toast } = useToast();
+
+  const { data: coletasExistentes } = useQuery<ColetaGrupo2[]>({
+    queryKey: ["/api/coleta/grupo2"],
+  });
 
   const form = useForm<InsertColetaGrupo2>({
     resolver: zodResolver(insertColetaGrupo2Schema),
@@ -133,6 +138,28 @@ export default function FormularioGrupo2({
   });
 
   const onSubmit = (data: InsertColetaGrupo2) => {
+    const hoje = new Date().toISOString().split('T')[0];
+    if (dataColeta !== hoje) {
+      toast({
+        title: "Data inválida",
+        description: "Só é permitido registrar dados do dia atual.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const jaRegistrado = coletasExistentes?.some(
+      (c) => c.dataColeta === dataColeta && c.linhaProducao === linhaProducao
+    );
+    if (jaRegistrado) {
+      toast({
+        title: "Linha já registrada",
+        description: `A linha ${linhaProducao} já possui registro para o dia ${new Date(dataColeta).toLocaleDateString('pt-BR')}.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     mutation.mutate({ ...data, dataColeta, linhaProducao });
   };
 
@@ -143,7 +170,7 @@ export default function FormularioGrupo2({
       </h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {CAMPOS_GRUPO2.map((campo) => (
               <FormField
                 key={campo.name}

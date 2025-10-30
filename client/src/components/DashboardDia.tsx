@@ -202,6 +202,8 @@ export default function DashboardDia({
 
         const headers = [
           "",
+          "SKU",
+          "PESO SACOLA\nVARPE",
           "VELOCIDADE\nDA LINHA",
           "CORE ATTACH\n(ADESIVO\nCENTRAL)",
           "CORE WRAP\n(ADESIVO\nLATERAL)",
@@ -237,6 +239,8 @@ export default function DashboardDia({
           const row = ws.getRow(5 + idx);
           const values = [
             coleta.linhaProducao,
+            coleta.sku,
+            coleta.pesoSacolaVarpe,
             coleta.velocidadeLinha,
             coleta.coreAttach,
             coleta.coreWrap,
@@ -265,7 +269,7 @@ export default function DashboardDia({
         });
 
         const columnWidths = [
-          8, 12, 14, 14, 10, 10, 10, 14, 14, 12, 12, 12, 10, 10, 10, 10, 10, 12,
+          8, 12, 12, 12, 14, 14, 10, 10, 10, 14, 14, 12, 12, 12, 10, 10, 10, 10, 10, 12,
           12,
         ];
         columnWidths.forEach((width, idx) => {
@@ -292,6 +296,8 @@ export default function DashboardDia({
 
         const headers = [
           "",
+          "SKU",
+          "PESO SACOLA\nVARPE",
           "VELOCIDADE\nDA LINHA",
           "WAIST\nPACKER",
           "ISG\nELASTIC",
@@ -329,6 +335,8 @@ export default function DashboardDia({
           const row = ws.getRow(5 + idx);
           const values = [
             coleta.linhaProducao,
+            coleta.sku,
+            coleta.pesoSacolaVarpe,
             coleta.velocidadeLinha,
             coleta.waistPacker,
             coleta.isgElastic,
@@ -359,7 +367,7 @@ export default function DashboardDia({
         });
 
         const columnWidths = [
-          8, 12, 12, 10, 12, 14, 12, 10, 10, 10, 14, 12, 12, 12, 12, 14, 14, 12,
+          8, 12, 12, 12, 12, 10, 12, 14, 12, 10, 10, 10, 14, 12, 12, 12, 12, 14, 14, 12,
           10, 14, 10,
         ];
         columnWidths.forEach((width, idx) => {
@@ -456,6 +464,20 @@ export default function DashboardDia({
                       className="sticky left-0 bg-card z-10 border-r font-semibold"
                     >
                       Linha
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold"
+                    >
+                      SKU
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold"
+                    >
+                      Peso Sacola
+                      <br />
+                      Varpe
                     </TableHead>
                     <TableHead
                       rowSpan={3}
@@ -601,6 +623,8 @@ export default function DashboardDia({
                         <TableCell className="sticky left-0 bg-card font-medium border-r">
                           {coleta.linhaProducao}
                         </TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('sku', 'text')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('pesoSacolaVarpe')}</TableCell>
                         <TableCell className="text-center font-mono border-r">{renderCell('velocidadeLinha')}</TableCell>
                         <TableCell className="text-center font-mono border-r">{renderCell('coreAttach')}</TableCell>
                         <TableCell className="text-center font-mono border-r">{renderCell('coreWrap')}</TableCell>
@@ -664,6 +688,20 @@ export default function DashboardDia({
                       className="sticky left-0 bg-card z-10 border-r font-semibold"
                     >
                       Linha
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold"
+                    >
+                      SKU
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold"
+                    >
+                      Peso Sacola
+                      <br />
+                      Varpe
                     </TableHead>
                     <TableHead
                       rowSpan={3}
@@ -821,6 +859,8 @@ export default function DashboardDia({
                         <TableCell className="sticky left-0 bg-card font-medium border-r">
                           {coleta.linhaProducao}
                         </TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('sku', 'text')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('pesoSacolaVarpe')}</TableCell>
                         <TableCell className="text-center font-mono border-r">{renderCell('velocidadeLinha')}</TableCell>
                         <TableCell className="text-center font-mono border-r">{renderCell('waistPacker')}</TableCell>
                         <TableCell className="text-center font-mono border-r">{renderCell('isgElastic')}</TableCell>
