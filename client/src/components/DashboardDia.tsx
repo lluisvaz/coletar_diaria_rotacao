@@ -6,6 +6,7 @@ import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ArrowLeft, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import * as XLSX from "xlsx";
 
 interface DashboardDiaProps {
@@ -17,36 +18,49 @@ interface DashboardDiaProps {
 
 export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: DashboardDiaProps) {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const exportarParaExcel = () => {
     try {
       const wb = XLSX.utils.book_new();
-      
+
       // Formatar data para exibição
       const dataObj = parseISO(data);
       const dia = format(dataObj, "dd", { locale: ptBR });
       const mes = format(dataObj, "MMMM", { locale: ptBR }).toUpperCase();
 
-      // Criar planilha para Grupo 1 (L.90-L.83)
+      const titulo = "COLETA DIÁRIA DE ROTAÇÕES DAS BOMBAS DO SISTEMA NORDSON";
+
+      // --- Planilha 1: ABS e Tape (L.90-L.83) ---
       if (grupo1.length > 0) {
         const dadosGrupo1: any[][] = [
-          // Linha 0: Título
-          ["COLETA DIÁRIA DE ROTAÇÕES DAS BOMBAS DO SISTEMA NORDSON", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-          // Linha 1: Vazia
-          ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-          // Linha 2: DIA e MÊS
-          ["DIA", "", mes, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-          // Linha 3: Cabeçalhos principais
-          ["", "", "CORE ATTACH", "CORE WRAP", "", "", "", "LEG ELASTIC", "CUFF ELASTIC", "", "TOPSHEET", "BACKSHEET", "", "EAR", "", "", "", "TAPE ON", "FLUME 1X1"],
-          // Linha 4: Subcabeçalhos parte 1
-          ["VELOCIDADE", "VELOCIDADE", "(ADESIVO", "(ADESIVO", "SURGE", "CUFF END", "BEAD", "(ELÁSTICO DA", "(ELÁSTICO DA", "TEMPORARY", "(NON", "(POLY)", "FRONTAL", "ATTACH", "PULP FIX", "CENTRAL", "RELEASE", "BAG", ""],
-          // Linha 5: Subcabeçalhos parte 2
-          ["DA LINHA", "DA LINHA", "CENTRAL)", "LATERAL)", "", "", "", "PERNA)", "CUFF)", "", "WOVEN)", "", "", "", "", "", "", "", ""],
+          [titulo],
+          [],
+          [null, "DIA", dia, "MÊS", mes],
+          [
+            "LINHA",
+            "VELOCIDADE DA LINHA",
+            "CORE ATTACH (ADESIVO CENTRAL)",
+            "CORE WRAP (ADESIVO LATERAL)",
+            "SURGE",
+            "CUFF END",
+            "BEAD",
+            "LEG ELASTIC (ELÁSTICO DA PERNA)",
+            "CUFF ELASTIC (ELÁSTICO DA CUFF)",
+            "TEMPORARY",
+            "TOPSHEET (NON WOVEN)",
+            "BACKSHEET (POLY)",
+            "FRONTAL",
+            "EAR ATTACH",
+            "PULP FIX",
+            "CENTRAL",
+            "RELEASE",
+            "TAPE ON BAG",
+            "FILME 1X1" 
+          ]
         ];
 
-        // Ordenar grupo1 por linha de produção
         const grupo1Ordenado = [...grupo1].sort((a, b) => a.linhaProducao.localeCompare(b.linhaProducao));
-
         grupo1Ordenado.forEach(coleta => {
           dadosGrupo1.push([
             coleta.linhaProducao,
@@ -67,87 +81,75 @@ export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: Dashboa
             coleta.central,
             coleta.release,
             coleta.tapeOnBag,
-            coleta.flumeY,
+            coleta.flumeY, 
           ]);
         });
 
         const wsGrupo1 = XLSX.utils.aoa_to_sheet(dadosGrupo1);
-        
-        // Mesclar células do cabeçalho conforme as imagens
-        if (!wsGrupo1['!merges']) wsGrupo1['!merges'] = [];
-        wsGrupo1['!merges'].push(
-          // Título principal (linha 0, todas as colunas)
+
+        wsGrupo1['!merges'] = [
           { s: { r: 0, c: 0 }, e: { r: 0, c: 18 } },
-          // DIA (linha 2-5, coluna 0)
-          { s: { r: 2, c: 0 }, e: { r: 5, c: 0 } },
-          // Célula vazia entre DIA e MÊS (linha 2, coluna 1)
-          { s: { r: 2, c: 1 }, e: { r: 5, c: 1 } },
-          // MÊS (linha 2, colunas 2-18)
-          { s: { r: 2, c: 2 }, e: { r: 2, c: 18 } },
-          // CORE ATTACH header (linha 3, colunas 2-3)
-          { s: { r: 3, c: 2 }, e: { r: 3, c: 3 } },
-          // SURGE (linha 3-5, coluna 4)
-          { s: { r: 3, c: 4 }, e: { r: 5, c: 4 } },
-          // CUFF END (linha 3-5, coluna 5)
-          { s: { r: 3, c: 5 }, e: { r: 5, c: 5 } },
-          // BEAD (linha 3-5, coluna 6)
-          { s: { r: 3, c: 6 }, e: { r: 5, c: 6 } },
-          // LEG ELASTIC / CUFF ELASTIC header (linha 3, colunas 7-8)
-          { s: { r: 3, c: 7 }, e: { r: 3, c: 8 } },
-          // TEMPORARY (linha 3-5, coluna 9)
-          { s: { r: 3, c: 9 }, e: { r: 5, c: 9 } },
-          // TOPSHEET / BACKSHEET header (linha 3, colunas 10-11)
-          { s: { r: 3, c: 10 }, e: { r: 3, c: 11 } },
-          // FRONTAL (linha 3-5, coluna 12)
-          { s: { r: 3, c: 12 }, e: { r: 5, c: 12 } },
-          // EAR header (linha 3, coluna 13)
-          { s: { r: 3, c: 13 }, e: { r: 5, c: 13 } },
-          // PULP FIX (linha 3-5, coluna 14)
-          { s: { r: 3, c: 14 }, e: { r: 5, c: 14 } },
-          // CENTRAL (linha 3-5, coluna 15)
-          { s: { r: 3, c: 15 }, e: { r: 5, c: 15 } },
-          // RELEASE (linha 3-5, coluna 16)
-          { s: { r: 3, c: 16 }, e: { r: 5, c: 16 } },
-          // TAPE ON BAG (linha 3, coluna 17)
-          { s: { r: 3, c: 17 }, e: { r: 5, c: 17 } },
-          // FLUME 1X1 (linha 3, coluna 18)
-          { s: { r: 3, c: 18 }, e: { r: 5, c: 18 } },
-          // VELOCIDADE DA LINHA (linhas 4-5, coluna 1)
-          { s: { r: 4, c: 1 }, e: { r: 5, c: 1 } },
-          // CORE ATTACH subcabeçalhos (linhas 4-5)
-          { s: { r: 4, c: 2 }, e: { r: 5, c: 2 } },
-          { s: { r: 4, c: 3 }, e: { r: 5, c: 3 } },
-          // LEG ELASTIC subcabeçalhos (linhas 4-5)
-          { s: { r: 4, c: 7 }, e: { r: 5, c: 7 } },
-          { s: { r: 4, c: 8 }, e: { r: 5, c: 8 } },
-          // TOPSHEET subcabeçalhos (linhas 4-5)
-          { s: { r: 4, c: 10 }, e: { r: 5, c: 10 } },
-          { s: { r: 4, c: 11 }, e: { r: 5, c: 11 } },
-        );
-
-        XLSX.utils.book_append_sheet(wb, wsGrupo1, "Grupo 1 (L.90-L.83)");
-      }
-
-      // Criar planilha para Grupo 2 (L.84-L.85)
-      if (grupo2.length > 0) {
-        const dadosGrupo2: any[][] = [
-          // Linha 0: Título
-          ["COLETA DIÁRIA DE ROTAÇÕES DAS BOMBAS DO SISTEMA NORDSON", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-          // Linha 1: Vazia
-          ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-          // Linha 2: DIA e MÊS
-          ["DIA", "", mes, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-          // Linha 3: Cabeçalhos principais
-          ["", "", "", "", "", "ISG SIDE", "ABSORVENT", "OUTER EDGE", "", "", "STANDING", "BACKFLIM FIX", "OSG SIDE", "OSG", "NW SEAL", "NW SEAL", "OUT SIDE", "TOPSHEET", "CORE", "CORE", "MAT FIX"],
-          // Linha 4: Subcabeçalhos parte 1
-          ["VELOCIDADE", "VELOCIDADE", "WAIST PACKER", "ISG ELASTIC", "WAIST ELASTIC", "SEAL", "FIX", "", "INNER", "BEAD", "GATHER", "", "SEAL", "ELÁSTICO", "CONT", "INT CENT", "BACK FLM", "FIX", "WRAP", "WRAP SIDE", ""],
-          // Linha 5: Subcabeçalhos parte 2
-          ["DA LINHA", "DA LINHA", "", "", "", "", "", "", "", "", "FRONT B. FIX", "", "", "", "(LATERAL)", "(RAL)", "", "", "", "SEAL", ""],
+          { s: { r: 2, c: 1 }, e: { r: 2, c: 2 } },
+          { s: { r: 2, c: 3 }, e: { r: 2, c: 4 } },
+        ];
+        
+        wsGrupo1['!cols'] = [
+          { wch: 8 },
+          { wch: 12 },
+          { wch: 14 },
+          { wch: 14 },
+          { wch: 10 },
+          { wch: 10 },
+          { wch: 10 },
+          { wch: 14 },
+          { wch: 14 },
+          { wch: 12 },
+          { wch: 12 },
+          { wch: 12 },
+          { wch: 10 },
+          { wch: 10 },
+          { wch: 10 },
+          { wch: 10 },
+          { wch: 10 },
+          { wch: 12 },
+          { wch: 12 },
         ];
 
-        // Ordenar grupo2 por linha de produção
-        const grupo2Ordenado = [...grupo2].sort((a, b) => a.linhaProducao.localeCompare(b.linhaProducao));
+        XLSX.utils.book_append_sheet(wb, wsGrupo1, "ABS e Tape");
+      }
 
+      // --- Planilha 2: Pants (L.84-L.85) ---
+      if (grupo2.length > 0) {
+        const dadosGrupo2: any[][] = [
+          [titulo],
+          [],
+          [null, "DIA", dia, "MÊS", mes],
+          [
+            "LINHA", 
+            "VELOCIDADE DA LINHA",
+            "WAIST PACKER",
+            "ISG ELASTIC",
+            "WAIST ELASTIC",
+            "ISG SIDE SEAL", 
+            "ABSORVENT FIX",
+            "OUTER EDGE",
+            "INNER",
+            "BEAD",
+            "STANDING GATHER FRONT B. FIX", 
+            "BACKFILM FIX",
+            "OSG SIDE SEAL",
+            "OSG ELÁSTICO (LATERAL)",
+            "NW SEAL CONT (LATERAL)", 
+            "NW SEAL INT CENT (RAL)",
+            "OUT SIDE BACK FILM FIX",
+            "TOPSHEET FIX",
+            "CORE WRAP",
+            "CORE WRAP SIDE SEAL",
+            "MAT FIX"
+          ]
+        ];
+        
+        const grupo2Ordenado = [...grupo2].sort((a, b) => a.linhaProducao.localeCompare(b.linhaProducao));
         grupo2Ordenado.forEach(coleta => {
           dadosGrupo2.push([
             coleta.linhaProducao,
@@ -176,67 +178,39 @@ export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: Dashboa
 
         const wsGrupo2 = XLSX.utils.aoa_to_sheet(dadosGrupo2);
         
-        // Mesclar células do cabeçalho conforme as imagens
-        if (!wsGrupo2['!merges']) wsGrupo2['!merges'] = [];
-        wsGrupo2['!merges'].push(
-          // Título principal (linha 0, todas as colunas)
+        wsGrupo2['!merges'] = [
           { s: { r: 0, c: 0 }, e: { r: 0, c: 20 } },
-          // DIA (linha 2-5, coluna 0)
-          { s: { r: 2, c: 0 }, e: { r: 5, c: 0 } },
-          // Célula vazia entre DIA e MÊS (linha 2, coluna 1)
-          { s: { r: 2, c: 1 }, e: { r: 5, c: 1 } },
-          // MÊS (linha 2, colunas 2-20)
-          { s: { r: 2, c: 2 }, e: { r: 2, c: 20 } },
-          // VELOCIDADE DA LINHA (linhas 4-5, coluna 1)
-          { s: { r: 4, c: 1 }, e: { r: 5, c: 1 } },
-          // WAIST PACKER (linhas 3-5, coluna 2)
-          { s: { r: 3, c: 2 }, e: { r: 5, c: 2 } },
-          // ISG ELASTIC (linhas 3-5, coluna 3)
-          { s: { r: 3, c: 3 }, e: { r: 5, c: 3 } },
-          // WAIST ELASTIC (linhas 3-5, coluna 4)
-          { s: { r: 3, c: 4 }, e: { r: 5, c: 4 } },
-          // ISG SIDE SEAL (linha 3, coluna 5)
-          { s: { r: 3, c: 5 }, e: { r: 5, c: 5 } },
-          // ABSORVENT FIX (linha 3, coluna 6)
-          { s: { r: 3, c: 6 }, e: { r: 5, c: 6 } },
-          // OUTER EDGE (linha 3-5, coluna 7)
-          { s: { r: 3, c: 7 }, e: { r: 5, c: 7 } },
-          // INNER (linhas 3-5, coluna 8)
-          { s: { r: 3, c: 8 }, e: { r: 5, c: 8 } },
-          // BEAD (linhas 3-5, coluna 9)
-          { s: { r: 3, c: 9 }, e: { r: 5, c: 9 } },
-          // STANDING GATHER header (linha 3, coluna 10)
-          { s: { r: 3, c: 10 }, e: { r: 3, c: 10 } },
-          // STANDING GATHER subcabeçalhos (linhas 4-5)
-          { s: { r: 4, c: 10 }, e: { r: 5, c: 10 } },
-          // BACKFLIM FIX (linhas 3-5, coluna 11)
-          { s: { r: 3, c: 11 }, e: { r: 5, c: 11 } },
-          // OSG SIDE SEAL (linha 3, coluna 12)
-          { s: { r: 3, c: 12 }, e: { r: 5, c: 12 } },
-          // OSG ELÁSTICO (linha 3, coluna 13)
-          { s: { r: 3, c: 13 }, e: { r: 5, c: 13 } },
-          // NW SEAL headers (linha 3, colunas 14-15)
-          { s: { r: 3, c: 14 }, e: { r: 3, c: 15 } },
-          // NW SEAL subcabeçalhos (linhas 4-5)
-          { s: { r: 4, c: 14 }, e: { r: 5, c: 14 } },
-          { s: { r: 4, c: 15 }, e: { r: 5, c: 15 } },
-          // OUT SIDE BACK FLM (linhas 3-5, coluna 16)
-          { s: { r: 3, c: 16 }, e: { r: 5, c: 16 } },
-          // TOPSHEET FIX (linha 3, coluna 17)
-          { s: { r: 3, c: 17 }, e: { r: 5, c: 17 } },
-          // CORE WRAP headers (linha 3, colunas 18-19)
-          { s: { r: 3, c: 18 }, e: { r: 3, c: 19 } },
-          // CORE WRAP subcabeçalhos (linhas 4-5)
-          { s: { r: 4, c: 18 }, e: { r: 5, c: 18 } },
-          { s: { r: 4, c: 19 }, e: { r: 5, c: 19 } },
-          // MAT FIX (linhas 3-5, coluna 20)
-          { s: { r: 3, c: 20 }, e: { r: 5, c: 20 } },
-        );
+          { s: { r: 2, c: 1 }, e: { r: 2, c: 2 } },
+          { s: { r: 2, c: 3 }, e: { r: 2, c: 4 } },
+        ];
 
-        XLSX.utils.book_append_sheet(wb, wsGrupo2, "Grupo 2 (L.84-L.85)");
+        wsGrupo2['!cols'] = [
+          { wch: 8 },
+          { wch: 12 },
+          { wch: 12 },
+          { wch: 10 },
+          { wch: 12 },
+          { wch: 14 },
+          { wch: 12 },
+          { wch: 10 },
+          { wch: 10 },
+          { wch: 10 },
+          { wch: 14 },
+          { wch: 12 },
+          { wch: 12 },
+          { wch: 12 },
+          { wch: 12 },
+          { wch: 14 },
+          { wch: 14 },
+          { wch: 12 },
+          { wch: 10 },
+          { wch: 14 },
+          { wch: 10 },
+        ];
+
+        XLSX.utils.book_append_sheet(wb, wsGrupo2, "Pants");
       }
 
-      // Gerar arquivo Excel
       const dataFormatada = format(parseISO(data), "dd-MM-yyyy", { locale: ptBR });
       XLSX.writeFile(wb, `Coleta_Nordson_${dataFormatada}.xlsx`);
 
@@ -244,6 +218,7 @@ export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: Dashboa
         title: "Exportação concluída!",
         description: `Arquivo Excel gerado com sucesso para o dia ${format(parseISO(data), "dd/MM/yyyy", { locale: ptBR })}.`,
       });
+
     } catch (error) {
       console.error("Erro ao exportar para Excel:", error);
       toast({
@@ -280,24 +255,23 @@ export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: Dashboa
               </CardDescription>
             </div>
           </div>
-          <Button
-            onClick={exportarParaExcel}
-            className="gap-2"
-            data-testid="button-exportar-excel"
-          >
-            <Download className="h-4 w-4" />
-            Exportar para Excel
-          </Button>
+          {!isMobile && (
+            <Button
+              onClick={exportarParaExcel}
+              className="gap-2"
+              data-testid="button-exportar-excel"
+            >
+              <Download className="h-4 w-4" />
+              Exportar para Excel
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-8">
         {/* Grupo 1 - L.90 até L.83 */}
         {grupo1Ordenado.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-center">
-              COLETA DIÁRIA DE ROTAÇÕES DAS BOMBAS DO SISTEMA NORDSON
-            </h3>
-            <h4 className="text-sm font-medium mb-2">Linhas L.90, L.91, L.92, L.93, L.94, L.80, L.81, L.82, L.83</h4>
+            <h4 className="text-sm font-medium mb-2">Absorventes e Fraldas Tape</h4>
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -360,10 +334,7 @@ export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: Dashboa
         {/* Grupo 2 - L.84 e L.85 */}
         {grupo2Ordenado.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-center">
-              COLETA DIÁRIA DE ROTAÇÕES DAS BOMBAS DO SISTEMA NORDSON
-            </h3>
-            <h4 className="text-sm font-medium mb-2">Linhas L.84 e L.85</h4>
+            <h4 className="text-sm font-medium mb-2">Fraldas Pants</h4>
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>

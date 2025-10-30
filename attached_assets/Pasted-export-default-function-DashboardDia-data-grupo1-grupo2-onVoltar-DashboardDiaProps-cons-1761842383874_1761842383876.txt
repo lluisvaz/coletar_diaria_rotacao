@@ -1,0 +1,323 @@
+export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: DashboardDiaProps) {
+  const { toast } = useToast();
+  const isMobile = useIsMobile(); // Esta variável estava no seu código original
+
+  /**
+   * Função de exportação para Excel com formatação de layout complexa.
+   * Gera duas abas (ABS e Tape, Pants) com cabeçalhos mesclados,
+   * bordas, centralização e quebra de linha.
+   * * REQUER A BIBLIOTECA "xlsx-style"
+   */
+  const exportarParaExcel = () => {
+    try {
+      const wb = XLSX.utils.book_new();
+
+      // Formatar data para exibição
+      const dataObj = parseISO(data);
+      const dia = format(dataObj, "dd", { locale: ptBR });
+      const mes = format(dataObj, "MMMM", { locale: ptBR }).toUpperCase();
+
+      const titulo = "COLETA DIÁRIA DE ROTAÇÕES DAS BOMBAS DO SISTEMA NORDSON";
+
+      // --- Definições de Estilo (Funciona com xlsx-style) ---
+
+      // Estilo base para CÉLULAS DE DADOS (com borda, centralizado, wrap)
+      const estiloDados = {
+        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+        border: {
+          top: { style: 'thin', color: { rgb: '000000' } },
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+          left: { style: 'thin', color: { rgb: '000000' } },
+          right: { style: 'thin', color: { rgb: '000000' } },
+        }
+      };
+
+      // Estilo do CABEÇALHO (herda de estiloDados + negrito e fundo cinza)
+      const estiloCabecalho = {
+        ...estiloDados, // Herda alignment e border
+        font: { bold: true, sz: 10 },
+        fill: {
+          patternType: 'solid',
+          fgColor: { rgb: 'D9D9D9' },
+          bgColor: { rgb: 'D9D9D9' }
+        },
+      };
+
+      // Estilo do TÍTULO (sem borda, centralizado, negrito)
+      const estiloTitulo = {
+        font: { bold: true, sz: 11 },
+        alignment: { horizontal: 'center', vertical: 'center' }
+      };
+      
+      // Estilo dos LABELS DE DATA (sem borda, centralizado, negrito)
+      const estiloDataLabel = {
+        font: { bold: true, sz: 10 },
+        alignment: { horizontal: 'center', vertical: 'center' }
+      };
+
+      // --- Planilha 1: ABS e Tape (L.90-L.83) ---
+      if (grupo1.length > 0) {
+        // 1. Construir a Matriz de Dados (Grid)
+        const dadosGrupo1: any[][] = [
+          [titulo], // Linha 0 (R=0)
+          [], // Linha 1 (R=1) - Vazia
+          [null, "DIA", dia, "MÊS", mes], // Linha 2 (R=2) - Data
+          [ // Linha 3 (R=3) - Cabeçalho
+            "", // Coluna A (Linha)
+            "VELOCIDADE\nDA LINHA",
+            "CORE ATTACH\n(ADESIVO\nCENTRAL)",
+            "CORE WRAP\n(ADESIVO\nLATERAL)",
+            "SURGE",
+            "CUFF END",
+            "BEAD",
+            "LEG ELASTIC\n(ELÁSTICO DA\nPERNA)",
+            "CUFF ELASTIC\n(ELÁSTICO DA\nCUFF)",
+            "TEMPORARY",
+            "TOPSHEET\n(NON\nWOVEN)",
+            "BACKSHEET\n(POLY)",
+            "FRONTAL",
+            "EAR\nATTACH",
+            "PULP FIX",
+            "CENTRAL",
+            "RELEASE",
+            "TAPE ON\nBAG",
+            "FILME 1X1" 
+          ]
+        ];
+
+        // 2. Adicionar dados das coletas
+        const grupo1Ordenado = [...grupo1].sort((a, b) => a.linhaProducao.localeCompare(b.linhaProducao));
+        grupo1Ordenado.forEach(coleta => {
+          dadosGrupo1.push([
+            coleta.linhaProducao,
+            coleta.velocidadeLinha,
+            coleta.coreAttach,
+            coleta.coreWrap,
+            coleta.surge,
+            coleta.cuffEnd,
+            coleta.bead,
+            coleta.legElastic,
+            coleta.cuffElastic,
+            coleta.temporary,
+            coleta.topsheet,
+            coleta.backsheet,
+            coleta.frontal,
+            coleta.earAttach,
+            coleta.pulpFix,
+            coleta.central,
+            coleta.release,
+            coleta.tapeOnBag,
+            coleta.flumeY, 
+          ]);
+        });
+
+        // 3. Criar Planilha
+        const wsGrupo1 = XLSX.utils.aoa_to_sheet(dadosGrupo1);
+
+        // 4. Definir Mesclagens
+        wsGrupo1['!merges'] = [
+          { s: { r: 0, c: 0 }, e: { r: 0, c: 18 } },
+          { s: { r: 2, c: 1 }, e: { r: 2, c: 2 } },
+          { s: { r: 2, c: 3 }, e: { r: 2, c: 4 } },
+        ];
+        
+        // 5. Aplicar Estilos (Loop de Formatação)
+        const range = XLSX.utils.decode_range(wsGrupo1['!ref'] || 'A1');
+        for (let R = range.s.r; R <= range.e.r; R++) {
+          for (let C = range.s.c; C <= range.e.c; C++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+            if (!wsGrupo1[cellAddress]) wsGrupo1[cellAddress] = { t: 's', v: '' };
+
+            const cell = wsGrupo1[cellAddress];
+            
+            if (R === 0 && C === 0) { // Título (Apenas na célula inicial da mesclagem)
+              cell.s = estiloTitulo;
+            } else if (R === 2) { // Linha da Data
+              if (C === 1 || C === 3) { // Labels "DIA" e "MÊS"
+                cell.s = estiloDataLabel;
+              } else if (C === 2 || C === 4) { // Valores "dia" e "mes"
+                cell.s = estiloDados; // Aplicar estilo com borda/centro
+              }
+            } else if (R === 3) { // Linha do Cabeçalho
+              cell.s = estiloCabecalho;
+            } else if (R > 3) { // Linhas de Dados
+              cell.s = estiloDados;
+            }
+          }
+        }
+
+        // 6. Definir Largura das Colunas
+        wsGrupo1['!cols'] = [
+          { wch: 8 },  // LINHA
+          { wch: 12 }, // VELOCIDADE DA LINHA
+          { wch: 14 }, // CORE ATTACH
+          { wch: 14 }, // CORE WRAP
+          { wch: 10 }, // SURGE
+          { wch: 10 }, // CUFF END
+          { wch: 10 }, // BEAD
+          { wch: 14 }, // LEG ELASTIC
+          { wch: 14 }, // CUFF ELASTIC
+          { wch: 12 }, // TEMPORARY
+          { wch: 12 }, // TOPSHEET
+          { wch: 12 }, // BACKSHEET
+          { wch: 10 }, // FRONTAL
+          { wch: 10 }, // EAR ATTACH
+          { wch: 10 }, // PULP FIX
+          { wch: 10 }, // CENTRAL
+          { wch: 10 }, // RELEASE
+          { wch: 12 }, // TAPE ON BAG
+          { wch: 12 }, // FILME 1X1
+        ];
+
+        // 7. Definir Altura da Linha do Cabeçalho
+        wsGrupo1['!rows'] = [];
+        wsGrupo1['!rows'][3] = { hpt: 45 }; // Altura para Linha 3 (cabeçalho)
+
+        XLSX.utils.book_append_sheet(wb, wsGrupo1, "ABS e Tape");
+      }
+
+      // --- Planilha 2: Pants (L.84-L.85) ---
+      if (grupo2.length > 0) {
+        // 1. Construir a Matriz de Dados (Grid)
+        const dadosGrupo2: any[][] = [
+          [titulo], // R=0
+          [], // R=1
+          [null, "DIA", dia, "MÊS", mes], // R=2
+          [ // R=3 (Cabeçalhos Corrigidos)
+            "", 
+            "VELOCIDADE\nDA LINHA",
+            "WAIST\nPACKER",
+            "ISG\nELASTIC",
+            "WAIST\nELASTIC",
+            "ISG SIDE\nSEAL", 
+            "ABSORVENT\nFIX",
+            "OUTER\nEDGE",
+            "INNER",
+            "BEAD",
+            "STANDING\nGATHER\nFRONT B. FIX", 
+            "BACKFILM\nFIX",
+            "OSG SIDE\nSEAL",
+            "OSG\nELÁSTICO\n(LATERAL)",
+            "NW SEAL\nCONT\n(LATERAL)", 
+            "NW SEAL\nINT CENT\n(RAL)",
+            "OUT SIDE\nBACK FILM\nFIX",
+            "TOPSHEET\nFIX",
+            "CORE\nWRAP",
+            "CORE\nWRAP SIDE\nSEAL",
+            "MAT FIX"
+          ]
+        ];
+        
+        // 2. Adicionar dados das coletas
+        const grupo2Ordenado = [...grupo2].sort((a, b) => a.linhaProducao.localeCompare(b.linhaProducao));
+        grupo2Ordenado.forEach(coleta => {
+          dadosGrupo2.push([
+            coleta.linhaProducao,
+            coleta.velocidadeLinha,
+            coleta.waistPacker,
+            coleta.isgElastic,
+            coleta.waistElastic,
+            coleta.isgSideSeal,
+            coleta.absorventFix,
+            coleta.outerEdge,
+            coleta.inner,
+            coleta.bead,
+            coleta.standingGather,
+            coleta.backflimFix,
+            coleta.osgSideSeal,
+            coleta.osgElastico,
+            coleta.nwSealContLateral,
+            coleta.nwSealIntCentRal,
+            coleta.outSideBackFlm,
+            coleta.topsheetFix,
+            coleta.coreWrap,
+            coleta.coreWrapSeal,
+            coleta.matFix,
+          ]);
+        });
+
+        // 3. Criar Planilha
+        const wsGrupo2 = XLSX.utils.aoa_to_sheet(dadosGrupo2);
+        
+        // 4. Definir Mesclagens
+        wsGrupo2['!merges'] = [
+          { s: { r: 0, c: 0 }, e: { r: 0, c: 20 } },
+          { s: { r: 2, c: 1 }, e: { r: 2, c: 2 } },
+          { s: { r: 2, c: 3 }, e: { r: 2, c: 4 } },
+        ];
+
+        // 5. Aplicar Estilos (Loop de Formatação)
+        const range2 = XLSX.utils.decode_range(wsGrupo2['!ref'] || 'A1');
+        for (let R = range2.s.r; R <= range2.e.r; R++) {
+          for (let C = range2.s.c; C <= rangee2.e.c; C++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+            if (!wsGrupo2[cellAddress]) wsGrupo2[cellAddress] = { t: 's', v: '' };
+
+            const cell = wsGrupo2[cellAddress];
+
+            if (R === 0 && C === 0) { // Título
+              cell.s = estiloTitulo;
+            } else if (R === 2) { // Linha da Data
+              if (C === 1 || C === 3) { // Labels "DIA" e "MÊS"
+                cell.s = estiloDataLabel;
+              } else if (C === 2 || C === 4) { // Valores "dia" e "mes"
+                cell.s = estiloDados; // Aplicar estilo com borda/centro
+              }
+            } else if (R === 3) { // Linha do Cabeçalho
+              cell.s = estiloCabecalho;
+            } else if (R > 3) { // Linhas de Dados
+              cell.s = estiloDados;
+            }
+          }
+        }
+
+        // 6. Definir Largura das Colunas
+        wsGrupo2['!cols'] = [
+          { wch: 8 },  // LINHA
+          { wch: 12 }, // VELOCIDADE DA LINHA
+          { wch: 12 }, // WAIST PACKER
+          { wch: 10 }, // ISG ELASTIC
+          { wch: 12 }, // WAIST ELASTIC
+          { wch: 14 }, // ISG SIDE SEAL
+          { wch: 12 }, // ABSORVENT FIX
+          { wch: 10 }, // OUTER EDGE
+          { wch: 10 }, // INNER
+          { wch: 10 }, // BEAD
+          { wch: 14 }, // STANDING GATHER FRONT B. FIX
+          { wch: 12 }, // BACKFILM FIX
+          { wch: 12 }, // OSG SIDE SEAL
+          { wch: 12 }, // OSG ELÁSTICO
+          { wch: 12 }, // NW SEAL CONT (LATERAL)
+          { wch: 14 }, // NW SEAL INT CENT (RAL)
+          { wch: 14 }, // OUT SIDE BACK FILM FIX
+          { wch: 12 }, // TOPSHEET FIX
+          { wch: 10 }, // CORE WRAP
+          { wch: 14 }, // CORE WRAP SIDE SEAL
+          { wch: 10 }, // MAT FIX
+        ];
+
+        // 7. Definir Altura da Linha do Cabeçalho
+        wsGrupo2['!rows'] = [];
+        wsGrupo2['!rows'][3] = { hpt: 45 }; // Altura para Linha 3 (cabeçalho)
+
+        XLSX.utils.book_append_sheet(wb, wsGrupo2, "Pants");
+      }
+
+      // --- Gerar e Baixar o Arquivo ---
+      const dataFormatada = format(parseISO(data), "dd-MM-yyyy", { locale: ptBR });
+      XLSX.writeFile(wb, `Coleta_Nordson_${dataFormatada}.xlsx`);
+
+      toast({
+        title: "Exportação concluída!",
+        description: `Arquivo Excel gerado com sucesso para o dia ${format(parseISO(data), "dd/MM/yyyy", { locale: ptBR })}.`,
+      });
+
+    } catch (error) {
+      console.error("Erro ao exportar para Excel:", error);
+      toast({
+        title: "Erro na exportação",
+        description: "Não foi possível gerar o arquivo Excel. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
