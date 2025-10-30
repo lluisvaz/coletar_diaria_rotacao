@@ -7,7 +7,7 @@ import { ptBR } from "date-fns/locale";
 import { ArrowLeft, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 interface DashboardDiaProps {
   data: string;
@@ -20,49 +20,82 @@ export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: Dashboa
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
-  const exportarParaExcel = () => {
+  const exportarParaExcel = async () => {
     try {
-      const wb = XLSX.utils.book_new();
+      const workbook = new ExcelJS.Workbook();
 
-      // Formatar data para exibição
       const dataObj = parseISO(data);
       const dia = format(dataObj, "dd", { locale: ptBR });
       const mes = format(dataObj, "MMMM", { locale: ptBR }).toUpperCase();
 
       const titulo = "COLETA DIÁRIA DE ROTAÇÕES DAS BOMBAS DO SISTEMA NORDSON";
 
-      // --- Planilha 1: ABS e Tape (L.90-L.83) ---
+      const estiloDados = {
+        alignment: { horizontal: 'center' as const, vertical: 'middle' as const, wrapText: true },
+        border: {
+          top: { style: 'thin' as const },
+          bottom: { style: 'thin' as const },
+          left: { style: 'thin' as const },
+          right: { style: 'thin' as const },
+        }
+      };
+
+      const estiloCabecalho = {
+        ...estiloDados,
+        font: { bold: true, size: 10 },
+        fill: {
+          type: 'pattern' as const,
+          pattern: 'solid' as const,
+          fgColor: { argb: 'FFD9D9D9' },
+        },
+      };
+
+      const estiloTitulo = {
+        font: { bold: true, size: 11 },
+        alignment: { horizontal: 'center' as const, vertical: 'middle' as const }
+      };
+      
+      const estiloDataLabel = {
+        font: { bold: true, size: 10 },
+        alignment: { horizontal: 'center' as const, vertical: 'middle' as const }
+      };
+
       if (grupo1.length > 0) {
-        const dadosGrupo1: any[][] = [
-          [titulo],
-          [],
-          [null, "DIA", dia, "MÊS", mes],
-          [
-            "LINHA",
-            "VELOCIDADE DA LINHA",
-            "CORE ATTACH (ADESIVO CENTRAL)",
-            "CORE WRAP (ADESIVO LATERAL)",
-            "SURGE",
-            "CUFF END",
-            "BEAD",
-            "LEG ELASTIC (ELÁSTICO DA PERNA)",
-            "CUFF ELASTIC (ELÁSTICO DA CUFF)",
-            "TEMPORARY",
-            "TOPSHEET (NON WOVEN)",
-            "BACKSHEET (POLY)",
-            "FRONTAL",
-            "EAR ATTACH",
-            "PULP FIX",
-            "CENTRAL",
-            "RELEASE",
-            "TAPE ON BAG",
-            "FILME 1X1" 
-          ]
+        const ws = workbook.addWorksheet("ABS e Tape");
+
+        ws.mergeCells('A1:S1');
+        ws.getCell('A1').value = titulo;
+        ws.getCell('A1').style = estiloTitulo;
+
+        ws.getCell('B3').value = 'DIA';
+        ws.getCell('B3').style = estiloDataLabel;
+        ws.mergeCells('B3:C3');
+        ws.getCell('C3').value = dia;
+
+        ws.getCell('D3').value = 'MÊS';
+        ws.getCell('D3').style = estiloDataLabel;
+        ws.mergeCells('D3:E3');
+        ws.getCell('E3').value = mes;
+
+        const headers = [
+          '', 'VELOCIDADE\nDA LINHA', 'CORE ATTACH\n(ADESIVO\nCENTRAL)', 'CORE WRAP\n(ADESIVO\nLATERAL)',
+          'SURGE', 'CUFF END', 'BEAD', 'LEG ELASTIC\n(ELÁSTICO DA\nPERNA)', 'CUFF ELASTIC\n(ELÁSTICO DA\nCUFF)',
+          'TEMPORARY', 'TOPSHEET\n(NON\nWOVEN)', 'BACKSHEET\n(POLY)', 'FRONTAL', 'EAR\nATTACH',
+          'PULP FIX', 'CENTRAL', 'RELEASE', 'TAPE ON\nBAG', 'FILME 1X1'
         ];
 
+        const headerRow = ws.getRow(4);
+        headers.forEach((header, index) => {
+          const cell = headerRow.getCell(index + 1);
+          cell.value = header;
+          cell.style = estiloCabecalho;
+        });
+        headerRow.height = 45;
+
         const grupo1Ordenado = [...grupo1].sort((a, b) => a.linhaProducao.localeCompare(b.linhaProducao));
-        grupo1Ordenado.forEach(coleta => {
-          dadosGrupo1.push([
+        grupo1Ordenado.forEach((coleta, idx) => {
+          const row = ws.getRow(5 + idx);
+          const values = [
             coleta.linhaProducao,
             coleta.velocidadeLinha,
             coleta.coreAttach,
@@ -81,77 +114,59 @@ export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: Dashboa
             coleta.central,
             coleta.release,
             coleta.tapeOnBag,
-            coleta.flumeY, 
-          ]);
+            coleta.flumeY,
+          ];
+          
+          values.forEach((value, colIdx) => {
+            const cell = row.getCell(colIdx + 1);
+            cell.value = value;
+            cell.style = estiloDados;
+          });
         });
 
-        const wsGrupo1 = XLSX.utils.aoa_to_sheet(dadosGrupo1);
-
-        wsGrupo1['!merges'] = [
-          { s: { r: 0, c: 0 }, e: { r: 0, c: 18 } },
-          { s: { r: 2, c: 1 }, e: { r: 2, c: 2 } },
-          { s: { r: 2, c: 3 }, e: { r: 2, c: 4 } },
-        ];
-        
-        wsGrupo1['!cols'] = [
-          { wch: 8 },
-          { wch: 12 },
-          { wch: 14 },
-          { wch: 14 },
-          { wch: 10 },
-          { wch: 10 },
-          { wch: 10 },
-          { wch: 14 },
-          { wch: 14 },
-          { wch: 12 },
-          { wch: 12 },
-          { wch: 12 },
-          { wch: 10 },
-          { wch: 10 },
-          { wch: 10 },
-          { wch: 10 },
-          { wch: 10 },
-          { wch: 12 },
-          { wch: 12 },
-        ];
-
-        XLSX.utils.book_append_sheet(wb, wsGrupo1, "ABS e Tape");
+        const columnWidths = [8, 12, 14, 14, 10, 10, 10, 14, 14, 12, 12, 12, 10, 10, 10, 10, 10, 12, 12];
+        columnWidths.forEach((width, idx) => {
+          ws.getColumn(idx + 1).width = width;
+        });
       }
 
-      // --- Planilha 2: Pants (L.84-L.85) ---
       if (grupo2.length > 0) {
-        const dadosGrupo2: any[][] = [
-          [titulo],
-          [],
-          [null, "DIA", dia, "MÊS", mes],
-          [
-            "LINHA", 
-            "VELOCIDADE DA LINHA",
-            "WAIST PACKER",
-            "ISG ELASTIC",
-            "WAIST ELASTIC",
-            "ISG SIDE SEAL", 
-            "ABSORVENT FIX",
-            "OUTER EDGE",
-            "INNER",
-            "BEAD",
-            "STANDING GATHER FRONT B. FIX", 
-            "BACKFILM FIX",
-            "OSG SIDE SEAL",
-            "OSG ELÁSTICO (LATERAL)",
-            "NW SEAL CONT (LATERAL)", 
-            "NW SEAL INT CENT (RAL)",
-            "OUT SIDE BACK FILM FIX",
-            "TOPSHEET FIX",
-            "CORE WRAP",
-            "CORE WRAP SIDE SEAL",
-            "MAT FIX"
-          ]
+        const ws = workbook.addWorksheet("Pants");
+
+        ws.mergeCells('A1:U1');
+        ws.getCell('A1').value = titulo;
+        ws.getCell('A1').style = estiloTitulo;
+
+        ws.getCell('B3').value = 'DIA';
+        ws.getCell('B3').style = estiloDataLabel;
+        ws.mergeCells('B3:C3');
+        ws.getCell('C3').value = dia;
+
+        ws.getCell('D3').value = 'MÊS';
+        ws.getCell('D3').style = estiloDataLabel;
+        ws.mergeCells('D3:E3');
+        ws.getCell('E3').value = mes;
+
+        const headers = [
+          '', 'VELOCIDADE\nDA LINHA', 'WAIST\nPACKER', 'ISG\nELASTIC', 'WAIST\nELASTIC', 'ISG SIDE\nSEAL',
+          'ABSORVENT\nFIX', 'OUTER\nEDGE', 'INNER', 'BEAD', 'STANDING\nGATHER\nFRONT B. FIX',
+          'BACKFILM\nFIX', 'OSG SIDE\nSEAL', 'OSG\nELÁSTICO\n(LATERAL)', 'NW SEAL\nCONT\n(LATERAL)',
+          'NW SEAL\nINT CENT\n(RAL)', 'OUT SIDE\nBACK FILM\nFIX', 'TOPSHEET\nFIX', 'CORE\nWRAP',
+          'CORE\nWRAP SIDE\nSEAL', 'MAT FIX'
         ];
-        
+
+        const headerRow = ws.getRow(4);
+        headers.forEach((header, index) => {
+          const cell = headerRow.getCell(index + 1);
+          cell.value = header;
+          cell.style = estiloCabecalho;
+        });
+        headerRow.height = 45;
+
         const grupo2Ordenado = [...grupo2].sort((a, b) => a.linhaProducao.localeCompare(b.linhaProducao));
-        grupo2Ordenado.forEach(coleta => {
-          dadosGrupo2.push([
+        grupo2Ordenado.forEach((coleta, idx) => {
+          const row = ws.getRow(5 + idx);
+          const values = [
             coleta.linhaProducao,
             coleta.velocidadeLinha,
             coleta.waistPacker,
@@ -173,46 +188,30 @@ export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: Dashboa
             coleta.coreWrap,
             coleta.coreWrapSeal,
             coleta.matFix,
-          ]);
+          ];
+          
+          values.forEach((value, colIdx) => {
+            const cell = row.getCell(colIdx + 1);
+            cell.value = value;
+            cell.style = estiloDados;
+          });
         });
 
-        const wsGrupo2 = XLSX.utils.aoa_to_sheet(dadosGrupo2);
-        
-        wsGrupo2['!merges'] = [
-          { s: { r: 0, c: 0 }, e: { r: 0, c: 20 } },
-          { s: { r: 2, c: 1 }, e: { r: 2, c: 2 } },
-          { s: { r: 2, c: 3 }, e: { r: 2, c: 4 } },
-        ];
-
-        wsGrupo2['!cols'] = [
-          { wch: 8 },
-          { wch: 12 },
-          { wch: 12 },
-          { wch: 10 },
-          { wch: 12 },
-          { wch: 14 },
-          { wch: 12 },
-          { wch: 10 },
-          { wch: 10 },
-          { wch: 10 },
-          { wch: 14 },
-          { wch: 12 },
-          { wch: 12 },
-          { wch: 12 },
-          { wch: 12 },
-          { wch: 14 },
-          { wch: 14 },
-          { wch: 12 },
-          { wch: 10 },
-          { wch: 14 },
-          { wch: 10 },
-        ];
-
-        XLSX.utils.book_append_sheet(wb, wsGrupo2, "Pants");
+        const columnWidths = [8, 12, 12, 10, 12, 14, 12, 10, 10, 10, 14, 12, 12, 12, 12, 14, 14, 12, 10, 14, 10];
+        columnWidths.forEach((width, idx) => {
+          ws.getColumn(idx + 1).width = width;
+        });
       }
 
       const dataFormatada = format(parseISO(data), "dd-MM-yyyy", { locale: ptBR });
-      XLSX.writeFile(wb, `Coleta_Nordson_${dataFormatada}.xlsx`);
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Coleta_Nordson_${dataFormatada}.xlsx`;
+      link.click();
+      URL.revokeObjectURL(url);
 
       toast({
         title: "Exportação concluída!",
