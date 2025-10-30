@@ -17,10 +17,14 @@ import {
 import { type ColetaGrupo1, type ColetaGrupo2 } from "@shared/schema";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, Trash2, Edit, Check, X, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ExcelJS from "exceljs";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Input } from "@/components/ui/input";
 
 interface DashboardDiaProps {
   data: string;
@@ -37,6 +41,97 @@ export default function DashboardDia({
 }: DashboardDiaProps) {
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [editandoGrupo, setEditandoGrupo] = useState<1 | 2 | null>(null);
+  const [valoresEditados, setValoresEditados] = useState<any>({});
+
+  const updateGrupo1Mutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<ColetaGrupo1> }) =>
+      apiRequest("PUT", `/api/coleta/grupo1/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
+      toast({ title: "Sucesso!", description: "Registro atualizado." });
+      setEditandoId(null);
+      setEditandoGrupo(null);
+      setValoresEditados({});
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao atualizar.", variant: "destructive" });
+    },
+  });
+
+  const updateGrupo2Mutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<ColetaGrupo2> }) =>
+      apiRequest("PUT", `/api/coleta/grupo2/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo2"] });
+      toast({ title: "Sucesso!", description: "Registro atualizado." });
+      setEditandoId(null);
+      setEditandoGrupo(null);
+      setValoresEditados({});
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao atualizar.", variant: "destructive" });
+    },
+  });
+
+  const deleteGrupo1Mutation = useMutation({
+    mutationFn: (id: number) => apiRequest("DELETE", `/api/coleta/grupo1/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
+      toast({ title: "Sucesso!", description: "Registro excluído." });
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao excluir.", variant: "destructive" });
+    },
+  });
+
+  const deleteGrupo2Mutation = useMutation({
+    mutationFn: (id: number) => apiRequest("DELETE", `/api/coleta/grupo2/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo2"] });
+      toast({ title: "Sucesso!", description: "Registro excluído." });
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao excluir.", variant: "destructive" });
+    },
+  });
+
+  const iniciarEdicao = (coleta: ColetaGrupo1 | ColetaGrupo2, grupo: 1 | 2) => {
+    setEditandoId(coleta.id);
+    setEditandoGrupo(grupo);
+    setValoresEditados({ ...coleta });
+  };
+
+  const cancelarEdicao = () => {
+    setEditandoId(null);
+    setEditandoGrupo(null);
+    setValoresEditados({});
+  };
+
+  const salvarEdicao = () => {
+    if (editandoId === null || editandoGrupo === null) return;
+    
+    if (editandoGrupo === 1) {
+      updateGrupo1Mutation.mutate({ id: editandoId, data: valoresEditados });
+    } else {
+      updateGrupo2Mutation.mutate({ id: editandoId, data: valoresEditados });
+    }
+  };
+
+  const excluirRegistro = (id: number, grupo: 1 | 2) => {
+    if (!confirm("Tem certeza que deseja excluir este registro?")) return;
+    
+    if (grupo === 1) {
+      deleteGrupo1Mutation.mutate(id);
+    } else {
+      deleteGrupo2Mutation.mutate(id);
+    }
+  };
+
+  const atualizarCampo = (campo: string, valor: any) => {
+    setValoresEditados((prev: any) => ({ ...prev, [campo]: valor }));
+  };
 
   const exportarParaExcel = async () => {
     try {
@@ -458,7 +553,13 @@ export default function DashboardDia({
                       rowSpan={3}
                       className="text-center font-semibold"
                     >
-                      Filme 1x1flume
+                      Filme 1x1
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center font-semibold sticky right-0 bg-card"
+                    >
+                      Ações
                     </TableHead>
                   </TableRow>
                   <TableRow>
@@ -477,67 +578,73 @@ export default function DashboardDia({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {grupo1Ordenado.map((coleta) => (
-                    <TableRow key={coleta.id}>
-                      <TableCell className="sticky left-0 bg-card font-medium border-r">
-                        {coleta.linhaProducao}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.velocidadeLinha.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.coreAttach.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.coreWrap.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.surge.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.cuffEnd.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.bead.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.legElastic.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.cuffElastic.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.temporary.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.topsheet.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.backsheet.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.frontal.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.earAttach.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.pulpFix.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.central.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.release.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.tapeOnBag.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {coleta.filme1x1.toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {grupo1Ordenado.map((coleta) => {
+                    const isEditing = editandoId === coleta.id && editandoGrupo === 1;
+                    const displayData = isEditing ? valoresEditados : coleta;
+                    
+                    const renderCell = (field: keyof ColetaGrupo1, tipo: 'text' | 'number' = 'number') => (
+                      isEditing ? (
+                        <Input
+                          type={tipo}
+                          step={tipo === 'number' ? "0.01" : undefined}
+                          value={displayData[field] || (tipo === 'number' ? 0 : '')}
+                          onChange={(e) => atualizarCampo(field, tipo === 'number' ? parseFloat(e.target.value) || 0 : e.target.value)}
+                          className="h-7 text-xs text-center"
+                        />
+                      ) : (
+                        <span>{tipo === 'number' && typeof displayData[field] === 'number' ? displayData[field].toFixed(2) : displayData[field]}</span>
+                      )
+                    );
+                    
+                    return (
+                      <TableRow key={coleta.id}>
+                        <TableCell className="sticky left-0 bg-card font-medium border-r">
+                          {coleta.linhaProducao}
+                        </TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('velocidadeLinha')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('coreAttach')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('coreWrap')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('surge')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('cuffEnd')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('bead')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('legElastic')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('cuffElastic')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('temporary')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('topsheet')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('backsheet')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('frontal')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('earAttach')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('pulpFix')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('central')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('release')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('tapeOnBag')}</TableCell>
+                        <TableCell className="text-center font-mono">{renderCell('filme1x1')}</TableCell>
+                        <TableCell className="sticky right-0 bg-card">
+                          <div className="flex gap-1 justify-center">
+                            {isEditing ? (
+                              <>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={salvarEdicao}>
+                                  <Check className="h-4 w-4 text-green-600" />
+                                </Button>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelarEdicao}>
+                                  <X className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => iniciarEdicao(coleta, 1)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => excluirRegistro(coleta.id, 1)}>
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
@@ -674,6 +781,12 @@ export default function DashboardDia({
                     >
                       Mat Fix
                     </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center font-semibold sticky right-0 bg-card"
+                    >
+                      Ações
+                    </TableHead>
                   </TableRow>
                   <TableRow>
                     <TableHead className="text-center border-r text-xs">
@@ -685,73 +798,75 @@ export default function DashboardDia({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {grupo2Ordenado.map((coleta) => (
-                    <TableRow key={coleta.id}>
-                      <TableCell className="sticky left-0 bg-card font-medium border-r">
-                        {coleta.linhaProducao}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.velocidadeLinha.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.waistPacker.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.isgElastic.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.waistElastic.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.isgSideSeal.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.absorventFix.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.outerEdge.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.inner.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.bead.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.standingGather.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.backflimFix.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.osgSideSeal.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.osgElastico.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.nwSealContLateral.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.nwSealIntCentRal.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.outSideBackFlm.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.topsheetFix.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.coreWrap.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono border-r">
-                        {coleta.coreWrapSeal.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {coleta.matFix.toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {grupo2Ordenado.map((coleta) => {
+                    const isEditing = editandoId === coleta.id && editandoGrupo === 2;
+                    const displayData = isEditing ? valoresEditados : coleta;
+                    
+                    const renderCell = (field: keyof ColetaGrupo2, tipo: 'text' | 'number' = 'number') => (
+                      isEditing ? (
+                        <Input
+                          type={tipo}
+                          step={tipo === 'number' ? "0.01" : undefined}
+                          value={displayData[field] || (tipo === 'number' ? 0 : '')}
+                          onChange={(e) => atualizarCampo(field, tipo === 'number' ? parseFloat(e.target.value) || 0 : e.target.value)}
+                          className="h-7 text-xs text-center"
+                        />
+                      ) : (
+                        <span>{tipo === 'number' && typeof displayData[field] === 'number' ? displayData[field].toFixed(2) : displayData[field]}</span>
+                      )
+                    );
+                    
+                    return (
+                      <TableRow key={coleta.id}>
+                        <TableCell className="sticky left-0 bg-card font-medium border-r">
+                          {coleta.linhaProducao}
+                        </TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('velocidadeLinha')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('waistPacker')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('isgElastic')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('waistElastic')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('isgSideSeal')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('absorventFix')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('outerEdge')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('inner')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('bead')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('standingGather')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('backflimFix')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('osgSideSeal')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('osgElastico')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('nwSealContLateral')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('nwSealIntCentRal')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('outSideBackFlm')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('topsheetFix')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('coreWrap')}</TableCell>
+                        <TableCell className="text-center font-mono border-r">{renderCell('coreWrapSeal')}</TableCell>
+                        <TableCell className="text-center font-mono">{renderCell('matFix')}</TableCell>
+                        <TableCell className="sticky right-0 bg-card">
+                          <div className="flex gap-1 justify-center">
+                            {isEditing ? (
+                              <>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={salvarEdicao}>
+                                  <Check className="h-4 w-4 text-green-600" />
+                                </Button>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelarEdicao}>
+                                  <X className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => iniciarEdicao(coleta, 2)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => excluirRegistro(coleta.id, 2)}>
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
