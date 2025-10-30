@@ -1,0 +1,83 @@
+**Título do Projeto:** Logger de Rotação de Bombas Nordson (v2)
+
+**Objetivo do Projeto:**
+Construir uma aplicação web full-stack para substituir o preenchimento manual de planilhas Excel da coleta diária de rotação das bombas Nordson. A aplicação deve ser moderna, responsiva, fácil de usar e em português.
+
+**Stack de Tecnologia:**
+* **Frontend:** React (usando Vite).
+* **Estilização:** Tailwind CSS.
+* **Biblioteca de Componentes:** **Coss UI (coss.com/ui/docs)**. Este é um requisito principal. Todos os componentes de UI (inputs, botões, tabelas, etc.) devem vir desta biblioteca.
+* **Backend:** Node.js com Express.
+* **Banco de Dados:** SQLite.
+
+**Lógica de Negócio Central (O Ponto Crítico):**
+A aplicação deve lidar com dois tipos de formulários/dados fundamentalmente diferentes, baseados nas linhas de produção:
+
+1.  **Grupo 1 (Linhas L.90, L.91, L.92, L.93, L.94, L.80, L.81, L.82, L.83):**
+    * Usa 18 colunas de dados: `VELOCIDADE DA LINHA`, `CORE ATTACH`, `CORE WRAP`, `SURGE`, `CUFF END`, `BEAD`, `LEG ELASTIC`, `CUFF ELASTIC`, `TEMPORARY`, `TOPSHEET (NON WOVEN)`, `BACKSHEET (POLY)`, `FRONTAL`, `EAR ATTACH`, `PULP FIX`, `CENTRAL`, `RELEASE`, `TAPE ON BAG`, `FLUME (Y)`.
+
+2.  **Grupo 2 (Linhas L.84, L.85):**
+    * Usa 20 colunas de dados: `VELOCIDADE DA LINHA`, `WAIST PACKER`, `ISG ELASTIC`, `WAIST ELASTIC`, `ISG SIDE SEAL`, `ABSORVENT FIX`, `OUTER EDGE`, `INNER`, `BEAD`, `STANDING GATHER`, `BACKFLIM FIX`, `OSG SIDE SEAL`, `OSG ELÁSTICO`, `NW SEAL CONT (LATERAL)`, `NW SEAL INT CENT (RAL)`, `OUT SIDE BACK FLM`, `TOPSHEET FIX`, `CORE WRAP`, `CORE WRAP SEAL`, `MAT FIX`.
+
+**Esquema do Banco de Dados (Duas Tabelas):**
+Crie duas tabelas separadas no SQLite para armazenar os dados incompatíveis:
+
+* **Tabela 1: `Coleta_Grupo1`**
+    * `id` (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+    * `created_at` (DATETIME, DEFAULT CURRENT_TIMESTAMP)
+    * `data_coleta` (TEXT)
+    * `linha_producao` (TEXT)
+    * `velocidade_linha` (REAL)
+    * `core_attach` (REAL)
+    * `core_wrap` (REAL)
+    * ... (e todas as outras 15 colunas do Grupo 1, ex: `flume_y` REAL)
+
+* **Tabela 2: `Coleta_Grupo2`**
+    * `id` (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+    * `created_at` (DATETIME, DEFAULT CURRENT_TIMESTAMP)
+    * `data_coleta` (TEXT)
+    * `linha_producao` (TEXT)
+    * `velocidade_linha` (REAL)
+    * `waist_packer` (REAL)
+    * `isg_elastic` (REAL)
+    * ... (e todas as outras 18 colunas do Grupo 2, ex: `mat_fix` REAL)
+
+**Backend (API Endpoints):**
+Crie um backend Express com os seguintes endpoints REST API:
+
+* `POST /api/coleta/grupo1`: Salva dados na tabela `Coleta_Grupo1`.
+* `POST /api/coleta/grupo2`: Salva dados na tabela `Coleta_Grupo2`.
+* `GET /api/coleta/grupo1`: Retorna todos os dados da `Coleta_Grupo1`.
+* `GET /api/coleta/grupo2`: Retorna todos os dados da `Coleta_Grupo2`.
+
+**Frontend (UI Components com Coss UI):**
+Construa uma SPA (Single Page Application) moderna usando React, Tailwind e **Coss UI**.
+
+* **Componente 1: `FormularioDeEntrada.jsx` (O Formulário Dinâmico)**
+    * Este componente será a interface principal de entrada de dados.
+    * **Passo 1: Seleção Inicial.**
+        * Um campo `DatePicker` da Coss UI para "Data da Coleta".
+        * Um campo `Select` da Coss UI para "Linha de Produção".
+        * Opções do Select: [ "L.90", "L.91", "L.92", "L.93", "L.94", "L.80", "L.81", "L.82", "L.83", "L.84", "L.85" ].
+    * **Passo 2: Renderização Condicional.**
+        * Use a lógica do React (`useState`) para verificar a linha selecionada.
+        * **Se** a linha selecionada for do Grupo 1 (L.90-L.83), renderize o `FormularioGrupo1`.
+        * **Se** a linha selecionada for do Grupo 2 (L.84-L.85), renderize o `FormularioGrupo2`.
+
+* **Componente 2: `FormularioGrupo1.jsx`**
+    * Contém um formulário com os 18 campos de input (`Input` da Coss UI, `type="number"`) para o Grupo 1.
+    * Inclui um `Button` (da Coss UI) "Salvar Coleta" que envia os dados para `POST /api/coleta/grupo1`.
+
+* **Componente 3: `FormularioGrupo2.jsx`**
+    * Contém um formulário com os 20 campos de input (`Input` da Coss UI, `type="number"`) para o Grupo 2.
+    * Inclui um `Button` (da Coss UI) "Salvar Coleta" que envia os dados para `POST /api/coleta/grupo2`.
+
+* **Componente 4: `Dashboard.jsx` (O Painel de Visualização)**
+    * Busca os dados de `GET /api/coleta/grupo1` e `GET /api/coleta/grupo2`.
+    * Use o componente `Tabs` (Abas) da Coss UI para criar duas visualizações: "Coletas Grupo 1" e "Coletas Grupo 2".
+    * Dentro de cada aba, use o componente `Table` (Tabela) da Coss UI para exibir os dados de forma limpa e responsiva.
+
+**Ação:**
+Por favor, gere o código boilerplate para esta stack (Vite + React, Node.js + Express, SQLite).
+Em seguida, **configure o projeto para a Coss UI** (instalando dependências e configurando `tailwind.config.js` conforme a documentação).
+Finalmente, crie os arquivos iniciais para os modelos do banco de dados (ambas as tabelas) e para o componente principal `FormularioDeEntrada.jsx` com a lógica de renderização condicional.
