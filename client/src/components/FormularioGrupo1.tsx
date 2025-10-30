@@ -31,7 +31,7 @@ const CAMPOS_GRUPO1 = [
   { name: "central", label: "Central" },
   { name: "release", label: "Release" },
   { name: "tapeOnBag", label: "Tape on Bag" },
-  { name: "flumeY", label: "Flume (Y)" },
+  { name: "filme1x1", label: "Filme 1x1" },
 ] as const;
 
 export default function FormularioGrupo1({ dataColeta, linhaProducao }: FormularioGrupo1Props) {
@@ -59,7 +59,7 @@ export default function FormularioGrupo1({ dataColeta, linhaProducao }: Formular
       central: 0,
       release: 0,
       tapeOnBag: 0,
-      flumeY: 0,
+      filme1x1: 0,
     },
   });
 
@@ -91,7 +91,7 @@ export default function FormularioGrupo1({ dataColeta, linhaProducao }: Formular
         central: 0,
         release: 0,
         tapeOnBag: 0,
-        flumeY: 0,
+        filme1x1: 0,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
     },

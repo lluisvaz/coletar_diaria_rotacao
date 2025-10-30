@@ -1,0 +1,323 @@
+{
+  "id": "19812a11-c9b2-40b6-be7e-a141aebb9712",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.coleta_grupo1": {
+      "name": "coleta_grupo1",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "data_coleta": {
+          "name": "data_coleta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "linha_producao": {
+          "name": "linha_producao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "velocidade_linha": {
+          "name": "velocidade_linha",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "core_attach": {
+          "name": "core_attach",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "core_wrap": {
+          "name": "core_wrap",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "surge": {
+          "name": "surge",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cuff_end": {
+          "name": "cuff_end",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bead": {
+          "name": "bead",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "leg_elastic": {
+          "name": "leg_elastic",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cuff_elastic": {
+          "name": "cuff_elastic",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "temporary": {
+          "name": "temporary",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "topsheet": {
+          "name": "topsheet",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "backsheet": {
+          "name": "backsheet",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "frontal": {
+          "name": "frontal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ear_attach": {
+          "name": "ear_attach",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pulp_fix": {
+          "name": "pulp_fix",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "central": {
+          "name": "central",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "release": {
+          "name": "release",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tape_on_bag": {
+          "name": "tape_on_bag",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "filme_1x1": {
+          "name": "filme_1x1",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.coleta_grupo2": {
+      "name": "coleta_grupo2",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "data_coleta": {
+          "name": "data_coleta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "linha_producao": {
+          "name": "linha_producao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "velocidade_linha": {
+          "name": "velocidade_linha",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "waist_packer": {
+          "name": "waist_packer",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isg_elastic": {
+          "name": "isg_elastic",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "waist_elastic": {
+          "name": "waist_elastic",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isg_side_seal": {
+          "name": "isg_side_seal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "absorvent_fix": {
+          "name": "absorvent_fix",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "outer_edge": {
+          "name": "outer_edge",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inner": {
+          "name": "inner",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bead": {
+          "name": "bead",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "standing_gather": {
+          "name": "standing_gather",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "backflim_fix": {
+          "name": "backflim_fix",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "osg_side_seal": {
+          "name": "osg_side_seal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "osg_elastico": {
+          "name": "osg_elastico",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nw_seal_cont_lateral": {
+          "name": "nw_seal_cont_lateral",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nw_seal_int_cent_ral": {
+          "name": "nw_seal_int_cent_ral",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "out_side_back_flm": {
+          "name": "out_side_back_flm",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "topsheet_fix": {
+          "name": "topsheet_fix",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "core_wrap": {
+          "name": "core_wrap",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "core_wrap_seal": {
+          "name": "core_wrap_seal",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mat_fix": {
+          "name": "mat_fix",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

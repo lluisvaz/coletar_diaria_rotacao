@@ -25,7 +25,7 @@ export const coletaGrupo1 = pgTable("coleta_grupo1", {
   central: real("central").notNull(),
   release: real("release").notNull(),
   tapeOnBag: real("tape_on_bag").notNull(),
-  flumeY: real("flume_y").notNull(),
+  filme1x1: real("filme_1x1").notNull(),
 });
 
 export const coletaGrupo2 = pgTable("coleta_grupo2", {
