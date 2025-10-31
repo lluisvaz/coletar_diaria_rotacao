@@ -65,7 +65,7 @@ export default function FormularioGrupo1({
     defaultValues: {
       dataColeta,
       linhaProducao,
-      sku: '',
+      sku: "",
       pesoSacolaVarpe: 0,
       velocidadeLinha: 0,
       coreAttach: 0,
@@ -99,7 +99,7 @@ export default function FormularioGrupo1({
       form.reset({
         dataColeta,
         linhaProducao,
-        sku: '',
+        sku: "",
         pesoSacolaVarpe: 0,
         velocidadeLinha: 0,
         coreAttach: 0,
@@ -133,7 +133,11 @@ export default function FormularioGrupo1({
   });
 
   const onSubmit = (data: InsertColetaGrupo1) => {
-    const hoje = formatInTimeZone(new Date(), "America/Sao_Paulo", "yyyy-MM-dd");
+    const hoje = formatInTimeZone(
+      new Date(),
+      "America/Sao_Paulo",
+      "yyyy-MM-dd",
+    );
     if (dataColeta !== hoje) {
       toast({
         title: "Data inválida",
@@ -144,12 +148,12 @@ export default function FormularioGrupo1({
     }
 
     const jaRegistrado = coletasExistentes?.some(
-      (c) => c.dataColeta === dataColeta && c.linhaProducao === linhaProducao
+      (c) => c.dataColeta === dataColeta && c.linhaProducao === linhaProducao,
     );
     if (jaRegistrado) {
       toast({
         title: "Linha já registrada",
-        description: `A linha ${linhaProducao} já possui registro para o dia ${new Date(dataColeta).toLocaleDateString('pt-BR')}.`,
+        description: `A linha ${linhaProducao} já possui registro para o dia ${new Date(dataColeta).toLocaleDateString("pt-BR")}.`,
         variant: "destructive",
       });
       return;
@@ -160,9 +164,6 @@ export default function FormularioGrupo1({
 
   return (
     <div>
-      <h3 className="text-xl font-medium mb-4">
-        Preencha corretamente os dados da {linhaProducao}
-      </h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -185,7 +186,7 @@ export default function FormularioGrupo1({
                         data-testid={`input-${campo.name}`}
                         {...field}
                         onChange={(e) =>
-                          campo.type === "text" 
+                          campo.type === "text"
                             ? field.onChange(e.target.value)
                             : field.onChange(parseFloat(e.target.value) || 0)
                         }

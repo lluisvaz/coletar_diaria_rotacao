@@ -42,7 +42,11 @@ const CAMPOS_GRUPO2 = [
   { name: "backflimFix", label: "Backflim Fix", type: "number" },
   { name: "osgSideSeal", label: "OSG Side Seal", type: "number" },
   { name: "osgElastico", label: "OSG Elástico", type: "number" },
-  { name: "nwSealContLateral", label: "NW Seal Cont (Lateral)", type: "number" },
+  {
+    name: "nwSealContLateral",
+    label: "NW Seal Cont (Lateral)",
+    type: "number",
+  },
   { name: "nwSealIntCentRal", label: "NW Seal Int Cent (RAL)", type: "number" },
   { name: "outSideBackFlm", label: "Out Side Back FLM", type: "number" },
   { name: "topsheetFix", label: "Topsheet Fix", type: "number" },
@@ -67,7 +71,7 @@ export default function FormularioGrupo2({
     defaultValues: {
       dataColeta,
       linhaProducao,
-      sku: '',
+      sku: "",
       pesoSacolaVarpe: 0,
       velocidadeLinha: 0,
       waistPacker: 0,
@@ -103,7 +107,7 @@ export default function FormularioGrupo2({
       form.reset({
         dataColeta,
         linhaProducao,
-        sku: '',
+        sku: "",
         pesoSacolaVarpe: 0,
         velocidadeLinha: 0,
         waistPacker: 0,
@@ -139,7 +143,11 @@ export default function FormularioGrupo2({
   });
 
   const onSubmit = (data: InsertColetaGrupo2) => {
-    const hoje = formatInTimeZone(new Date(), "America/Sao_Paulo", "yyyy-MM-dd");
+    const hoje = formatInTimeZone(
+      new Date(),
+      "America/Sao_Paulo",
+      "yyyy-MM-dd",
+    );
     if (dataColeta !== hoje) {
       toast({
         title: "Data inválida",
@@ -150,12 +158,12 @@ export default function FormularioGrupo2({
     }
 
     const jaRegistrado = coletasExistentes?.some(
-      (c) => c.dataColeta === dataColeta && c.linhaProducao === linhaProducao
+      (c) => c.dataColeta === dataColeta && c.linhaProducao === linhaProducao,
     );
     if (jaRegistrado) {
       toast({
         title: "Linha já registrada",
-        description: `A linha ${linhaProducao} já possui registro para o dia ${new Date(dataColeta).toLocaleDateString('pt-BR')}.`,
+        description: `A linha ${linhaProducao} já possui registro para o dia ${new Date(dataColeta).toLocaleDateString("pt-BR")}.`,
         variant: "destructive",
       });
       return;
@@ -166,9 +174,6 @@ export default function FormularioGrupo2({
 
   return (
     <div>
-      <h3 className="text-xl font-medium mb-4">
-        Preencha corretamente os dados da {linhaProducao}
-      </h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -191,7 +196,7 @@ export default function FormularioGrupo2({
                         data-testid={`input-${campo.name}`}
                         {...field}
                         onChange={(e) =>
-                          campo.type === "text" 
+                          campo.type === "text"
                             ? field.onChange(e.target.value)
                             : field.onChange(parseFloat(e.target.value) || 0)
                         }
