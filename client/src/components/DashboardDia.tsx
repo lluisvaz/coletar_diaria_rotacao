@@ -687,9 +687,21 @@ export default function DashboardDia({
                     </TableHead>
                     <TableHead
                       rowSpan={3}
-                      className="text-center font-semibold"
+                      className="text-center border-r font-semibold"
                     >
                       Filme 1x1
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold"
+                    >
+                      Parâmetro do Painel
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center font-semibold"
+                    >
+                      Acrisson
                     </TableHead>
                     <TableHead
                       rowSpan={3}
@@ -777,8 +789,14 @@ export default function DashboardDia({
                         <TableCell className="text-center font-mono border-r">
                           {coleta.tapeOnBag?.toFixed(2)}
                         </TableCell>
-                        <TableCell className="text-center font-mono">
+                        <TableCell className="text-center font-mono border-r">
                           {coleta.filme1x1?.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-center font-mono border-r">
+                          {["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao) ? coleta.parametroPainel?.toFixed(2) : "-"}
+                        </TableCell>
+                        <TableCell className="text-center font-mono">
+                          {["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao) ? coleta.acrisson?.toFixed(2) : "-"}
                         </TableCell>
                         <TableCell className="sticky right-0 bg-card">
                           <div className="flex gap-1 justify-center">
@@ -951,9 +969,21 @@ export default function DashboardDia({
                     </TableHead>
                     <TableHead
                       rowSpan={3}
-                      className="text-center font-semibold"
+                      className="text-center border-r font-semibold"
                     >
                       Mat Fix
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold"
+                    >
+                      Parâmetro do Painel
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center font-semibold"
+                    >
+                      Acrisson
                     </TableHead>
                     <TableHead
                       rowSpan={3}
@@ -1041,8 +1071,14 @@ export default function DashboardDia({
                         <TableCell className="text-center font-mono border-r">
                           {coleta.coreWrapSeal?.toFixed(2)}
                         </TableCell>
-                        <TableCell className="text-center font-mono">
+                        <TableCell className="text-center font-mono border-r">
                           {coleta.matFix?.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-center font-mono border-r">
+                          {coleta.parametroPainel?.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-center font-mono">
+                          {coleta.acrisson?.toFixed(2)}
                         </TableCell>
                         <TableCell className="sticky right-0 bg-card">
                           <div className="flex gap-1 justify-center">

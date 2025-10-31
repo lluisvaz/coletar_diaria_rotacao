@@ -149,6 +149,31 @@ export function FormularioEdicaoGrupo({ grupo, valoresEditados, atualizarCampo }
             data-testid="input-edit-filme1x1"
           />
         </div>
+        {/* Campos especiais apenas para L80-L83 */}
+        {["L80", "L81", "L82", "L83"].includes(valoresEditados.linhaProducao) && (
+          <>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Parâmetro do Painel</label>
+              <Input
+                type="number"
+                step="0.01"
+                value={valoresEditados.parametroPainel || 0}
+                onChange={(e) => atualizarCampo("parametroPainel", parseFloat(e.target.value) || 0)}
+                data-testid="input-edit-parametroPainel"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Acrisson</label>
+              <Input
+                type="number"
+                step="0.01"
+                value={valoresEditados.acrisson || 0}
+                onChange={(e) => atualizarCampo("acrisson", parseFloat(e.target.value) || 0)}
+                data-testid="input-edit-acrisson"
+              />
+            </div>
+          </>
+        )}
       </div>
     );
   }
@@ -372,6 +397,26 @@ export function FormularioEdicaoGrupo({ grupo, valoresEditados, atualizarCampo }
           value={valoresEditados.matFix || 0}
           onChange={(e) => atualizarCampo("matFix", parseFloat(e.target.value) || 0)}
           data-testid="input-edit-matFix"
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Parâmetro do Painel</label>
+        <Input
+          type="number"
+          step="0.01"
+          value={valoresEditados.parametroPainel || 0}
+          onChange={(e) => atualizarCampo("parametroPainel", parseFloat(e.target.value) || 0)}
+          data-testid="input-edit-parametroPainel"
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Acrisson</label>
+        <Input
+          type="number"
+          step="0.01"
+          value={valoresEditados.acrisson || 0}
+          onChange={(e) => atualizarCampo("acrisson", parseFloat(e.target.value) || 0)}
+          data-testid="input-edit-acrisson"
         />
       </div>
     </div>
