@@ -37,7 +37,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useConfirmer } from "@/components/ui/confirmer";
 import ExcelJS from "exceljs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Input } from "@/components/ui/input";
@@ -62,6 +62,10 @@ export default function DashboardDia({
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [editandoGrupo, setEditandoGrupo] = useState<1 | 2 | null>(null);
   const [valoresEditados, setValoresEditados] = useState<any>({});
+  const [modalHeight, setModalHeight] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartY, setDragStartY] = useState(0);
+  const [dragStartHeight, setDragStartHeight] = useState(0);
 
   const updateGrupo1Mutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<ColetaGrupo1> }) =>
@@ -178,6 +182,44 @@ export default function DashboardDia({
   const atualizarCampo = (campo: string, valor: any) => {
     setValoresEditados((prev: any) => ({ ...prev, [campo]: valor }));
   };
+
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isMobile) return;
+    setIsDragging(true);
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    setDragStartY(clientY);
+    setDragStartHeight(modalHeight);
+  };
+
+  const handleDragMove = (e: MouseEvent | TouchEvent) => {
+    if (!isDragging || !isMobile) return;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const deltaY = dragStartY - clientY;
+    const viewportHeight = window.innerHeight;
+    const deltaPercent = (deltaY / viewportHeight) * 100;
+    const newHeight = Math.min(Math.max(dragStartHeight + deltaPercent, 30), 90);
+    setModalHeight(newHeight);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isMobile && isDragging) {
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleDragMove);
+      window.addEventListener('touchend', handleDragEnd);
+      
+      return () => {
+        window.removeEventListener('mousemove', handleDragMove);
+        window.removeEventListener('mouseup', handleDragEnd);
+        window.removeEventListener('touchmove', handleDragMove);
+        window.removeEventListener('touchend', handleDragEnd);
+      };
+    }
+  }, [isDragging, isMobile]);
 
   const exportarParaExcel = async () => {
     try {
@@ -1014,11 +1056,28 @@ export default function DashboardDia({
       {ConfirmerDialog}
 
       <Dialog open={modalEdicaoAberto} onOpenChange={setModalEdicaoAberto}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Editar Registro</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
+        <DialogContent 
+          className={
+            isMobile
+              ? "fixed inset-x-0 bottom-0 max-w-none rounded-t-2xl border-t border-x-0 border-b-0 p-0 m-0 translate-x-0 translate-y-0 left-0 right-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom"
+              : "max-w-3xl max-h-[90vh] overflow-y-auto"
+          }
+          style={isMobile ? { height: `${modalHeight}vh` } : undefined}
+        >
+          {isMobile && (
+            <div 
+              className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing"
+              onMouseDown={handleDragStart}
+              onTouchStart={handleDragStart}
+            >
+              <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
+            </div>
+          )}
+          <div className={isMobile ? "px-6 pb-6 overflow-y-auto" : ""} style={isMobile ? { height: 'calc(100% - 80px)' } : undefined}>
+            <DialogHeader className={isMobile ? "pb-4" : ""}>
+              <DialogTitle>Editar Registro</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
             {editandoGrupo === 1 ? (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -1406,8 +1465,9 @@ export default function DashboardDia({
                 </div>
               </div>
             )}
+            </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className={isMobile ? "px-6 pb-4" : ""}>
             <Button variant="outline" onClick={cancelarEdicao} data-testid="button-cancel-edit">
               Cancelar
             </Button>
