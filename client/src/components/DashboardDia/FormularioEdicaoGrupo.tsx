@@ -11,7 +11,7 @@ export function FormularioEdicaoGrupo({ grupo, valoresEditados, atualizarCampo }
     return (
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">SKU</label>
+          <label className="text-sm font-medium text-blue-600 dark:text-blue-400">SKU</label>
           <Input
             type="text"
             value={valoresEditados.sku || ""}
@@ -20,13 +20,33 @@ export function FormularioEdicaoGrupo({ grupo, valoresEditados, atualizarCampo }
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium">Peso Sacola Varpe</label>
+          <label className="text-sm font-medium text-blue-600 dark:text-blue-400">Peso Sacola Varpe</label>
           <Input
             type="number"
             step="0.01"
             value={valoresEditados.pesoSacolaVarpe || 0}
             onChange={(e) => atualizarCampo("pesoSacolaVarpe", parseFloat(e.target.value) || 0)}
             data-testid="input-edit-pesoSacolaVarpe"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-blue-600 dark:text-blue-400">Parâmetro do Painel</label>
+          <Input
+            type="number"
+            step="0.01"
+            value={valoresEditados.parametroPainel || 0}
+            onChange={(e) => atualizarCampo("parametroPainel", parseFloat(e.target.value) || 0)}
+            data-testid="input-edit-parametroPainel"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-blue-600 dark:text-blue-400">Acrisson</label>
+          <Input
+            type="number"
+            step="0.01"
+            value={valoresEditados.acrisson || 0}
+            onChange={(e) => atualizarCampo("acrisson", parseFloat(e.target.value) || 0)}
+            data-testid="input-edit-acrisson"
           />
         </div>
         <div className="space-y-2">
@@ -149,31 +169,6 @@ export function FormularioEdicaoGrupo({ grupo, valoresEditados, atualizarCampo }
             data-testid="input-edit-filme1x1"
           />
         </div>
-        {/* Campos especiais apenas para L80-L83 */}
-        {["L80", "L81", "L82", "L83"].includes(valoresEditados.linhaProducao) && (
-          <>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Parâmetro do Painel</label>
-              <Input
-                type="number"
-                step="0.01"
-                value={valoresEditados.parametroPainel || 0}
-                onChange={(e) => atualizarCampo("parametroPainel", parseFloat(e.target.value) || 0)}
-                data-testid="input-edit-parametroPainel"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Acrisson</label>
-              <Input
-                type="number"
-                step="0.01"
-                value={valoresEditados.acrisson || 0}
-                onChange={(e) => atualizarCampo("acrisson", parseFloat(e.target.value) || 0)}
-                data-testid="input-edit-acrisson"
-              />
-            </div>
-          </>
-        )}
       </div>
     );
   }
@@ -181,7 +176,7 @@ export function FormularioEdicaoGrupo({ grupo, valoresEditados, atualizarCampo }
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <label className="text-sm font-medium">SKU</label>
+        <label className="text-sm font-medium text-blue-600 dark:text-blue-400">SKU</label>
         <Input
           type="text"
           value={valoresEditados.sku || ""}
@@ -190,13 +185,33 @@ export function FormularioEdicaoGrupo({ grupo, valoresEditados, atualizarCampo }
         />
       </div>
       <div className="space-y-2">
-        <label className="text-sm font-medium">Peso Sacola Varpe</label>
+        <label className="text-sm font-medium text-blue-600 dark:text-blue-400">Peso Sacola Varpe</label>
         <Input
           type="number"
           step="0.01"
           value={valoresEditados.pesoSacolaVarpe || 0}
           onChange={(e) => atualizarCampo("pesoSacolaVarpe", parseFloat(e.target.value) || 0)}
           data-testid="input-edit-pesoSacolaVarpe"
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-blue-600 dark:text-blue-400">Parâmetro do Painel</label>
+        <Input
+          type="number"
+          step="0.01"
+          value={valoresEditados.parametroPainel || 0}
+          onChange={(e) => atualizarCampo("parametroPainel", parseFloat(e.target.value) || 0)}
+          data-testid="input-edit-parametroPainel"
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-blue-600 dark:text-blue-400">Acrisson</label>
+        <Input
+          type="number"
+          step="0.01"
+          value={valoresEditados.acrisson || 0}
+          onChange={(e) => atualizarCampo("acrisson", parseFloat(e.target.value) || 0)}
+          data-testid="input-edit-acrisson"
         />
       </div>
       <div className="space-y-2">
@@ -397,26 +412,6 @@ export function FormularioEdicaoGrupo({ grupo, valoresEditados, atualizarCampo }
           value={valoresEditados.matFix || 0}
           onChange={(e) => atualizarCampo("matFix", parseFloat(e.target.value) || 0)}
           data-testid="input-edit-matFix"
-        />
-      </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Parâmetro do Painel</label>
-        <Input
-          type="number"
-          step="0.01"
-          value={valoresEditados.parametroPainel || 0}
-          onChange={(e) => atualizarCampo("parametroPainel", parseFloat(e.target.value) || 0)}
-          data-testid="input-edit-parametroPainel"
-        />
-      </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Acrisson</label>
-        <Input
-          type="number"
-          step="0.01"
-          value={valoresEditados.acrisson || 0}
-          onChange={(e) => atualizarCampo("acrisson", parseFloat(e.target.value) || 0)}
-          data-testid="input-edit-acrisson"
         />
       </div>
     </div>
