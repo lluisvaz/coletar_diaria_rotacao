@@ -104,6 +104,7 @@ export default function FormularioGrupo2({
       toast({
         title: "Sucesso!",
         description: "Coleta salva com sucesso.",
+        variant: "success",
       });
       form.reset({
         dataColeta,

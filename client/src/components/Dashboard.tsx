@@ -68,7 +68,7 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo2"] });
-      toast({ title: "Sucesso!", description: "Todos os registros do dia foram excluídos." });
+      toast({ title: "Sucesso!", description: "Todos os registros do dia foram excluídos.", variant: "success" });
     },
     onError: () => {
       toast({ title: "Erro", description: "Falha ao excluir registros.", variant: "destructive" });

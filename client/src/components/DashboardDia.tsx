@@ -76,7 +76,7 @@ export default function DashboardDia({
       apiRequest("PUT", `/api/coleta/grupo1/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
-      toast({ title: "Sucesso!", description: "Registro atualizado." });
+      toast({ title: "Sucesso!", description: "Registro atualizado.", variant: "success" });
       setModalEdicaoAberto(false);
       setEditandoId(null);
       setEditandoGrupo(null);
@@ -96,7 +96,7 @@ export default function DashboardDia({
       apiRequest("PUT", `/api/coleta/grupo2/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo2"] });
-      toast({ title: "Sucesso!", description: "Registro atualizado." });
+      toast({ title: "Sucesso!", description: "Registro atualizado.", variant: "success" });
       setModalEdicaoAberto(false);
       setEditandoId(null);
       setEditandoGrupo(null);
@@ -116,7 +116,7 @@ export default function DashboardDia({
       apiRequest("DELETE", `/api/coleta/grupo1/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
-      toast({ title: "Sucesso!", description: "Registro excluído." });
+      toast({ title: "Sucesso!", description: "Registro excluído.", variant: "success" });
     },
     onError: () => {
       toast({
@@ -132,7 +132,7 @@ export default function DashboardDia({
       apiRequest("DELETE", `/api/coleta/grupo2/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo2"] });
-      toast({ title: "Sucesso!", description: "Registro excluído." });
+      toast({ title: "Sucesso!", description: "Registro excluído.", variant: "success" });
     },
     onError: () => {
       toast({
@@ -446,6 +446,7 @@ export default function DashboardDia({
       toast({
         title: "Exportação concluída!",
         description: `Arquivo Excel gerado com sucesso para o dia ${format(parseISO(data), "dd/MM/yyyy", { locale: ptBR })}.`,
+        variant: "success",
       });
     } catch (error) {
       console.error("Erro ao exportar para Excel:", error);
