@@ -11,7 +11,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <header className="mb-8">
           <h1 className="text-2xl font-semibold text-foreground">
-            Logger de Rotação de Bombas Nordson
+            Rotação de Bombas - Personal Care
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Sistema de coleta diária de rotação das bombas
@@ -19,7 +19,10 @@ export default function Home() {
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6" data-testid="tabs-main">
+          <TabsList
+            className="grid w-full grid-cols-2 mb-6"
+            data-testid="tabs-main"
+          >
             <TabsTrigger value="entrada" data-testid="tab-entrada">
               Entrada de Dados
             </TabsTrigger>
