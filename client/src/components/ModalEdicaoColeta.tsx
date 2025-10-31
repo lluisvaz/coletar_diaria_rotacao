@@ -36,6 +36,10 @@ export default function ModalEdicaoColeta({
     if (grupo === 1) {
       const c = coleta as ColetaGrupo1;
       dados.pesoSacolaVarpe = Number(formData.get("pesoSacolaVarpe"));
+      if (["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao)) {
+        dados.parametroPainel = Number(formData.get("parametroPainel"));
+        dados.acrisson = Number(formData.get("acrisson"));
+      }
       dados.velocidadeLinha = Number(formData.get("velocidadeLinha"));
       dados.coreAttach = Number(formData.get("coreAttach"));
       dados.coreWrap = Number(formData.get("coreWrap"));
@@ -57,6 +61,8 @@ export default function ModalEdicaoColeta({
     } else {
       const c = coleta as ColetaGrupo2;
       dados.pesoSacolaVarpe = Number(formData.get("pesoSacolaVarpe"));
+      dados.parametroPainel = Number(formData.get("parametroPainel"));
+      dados.acrisson = Number(formData.get("acrisson"));
       dados.velocidadeLinha = Number(formData.get("velocidadeLinha"));
       dados.waistPacker = Number(formData.get("waistPacker"));
       dados.isgElastic = Number(formData.get("isgElastic"));
@@ -98,15 +104,27 @@ export default function ModalEdicaoColeta({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="sku">SKU</Label>
+              <Label htmlFor="sku" className="text-blue-600 dark:text-blue-400">SKU</Label>
               <Input id="sku" name="sku" defaultValue={coleta.sku} required />
             </div>
             {isGrupo1 && coletaG1 && (
               <>
                 <div className="space-y-2">
-                  <Label>Peso Sacola Varpe</Label>
+                  <Label className="text-blue-600 dark:text-blue-400">Peso Sacola Varpe</Label>
                   <Input type="number" name="pesoSacolaVarpe" defaultValue={coletaG1.pesoSacolaVarpe} required />
                 </div>
+                {["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao) && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-blue-600 dark:text-blue-400">Parâmetro do Painel</Label>
+                      <Input type="number" name="parametroPainel" defaultValue={coletaG1.parametroPainel ?? 0} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-blue-600 dark:text-blue-400">Acrisson</Label>
+                      <Input type="number" name="acrisson" defaultValue={coletaG1.acrisson ?? 0} required />
+                    </div>
+                  </>
+                )}
                 <div className="space-y-2">
                   <Label>Velocidade Linha</Label>
                   <Input type="number" name="velocidadeLinha" defaultValue={coletaG1.velocidadeLinha} required />
@@ -184,8 +202,16 @@ export default function ModalEdicaoColeta({
             {!isGrupo1 && coletaG2 && (
               <>
                 <div className="space-y-2">
-                  <Label>Peso Sacola Varpe</Label>
+                  <Label className="text-blue-600 dark:text-blue-400">Peso Sacola Varpe</Label>
                   <Input type="number" name="pesoSacolaVarpe" defaultValue={coletaG2.pesoSacolaVarpe} required />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-blue-600 dark:text-blue-400">Parâmetro do Painel</Label>
+                  <Input type="number" name="parametroPainel" defaultValue={coletaG2.parametroPainel ?? 0} required />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-blue-600 dark:text-blue-400">Acrisson</Label>
+                  <Input type="number" name="acrisson" defaultValue={coletaG2.acrisson ?? 0} required />
                 </div>
                 <div className="space-y-2">
                   <Label>Velocidade Linha</Label>

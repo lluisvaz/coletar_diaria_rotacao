@@ -27,6 +27,18 @@ interface FormularioGrupo2Props {
   onSalvarSucesso?: () => void;
 }
 
+// Campos iniciais (em azul) para Grupo 2
+const CAMPOS_INICIAIS_GRUPO2 = [
+  { name: "sku", label: "SKU", type: "text", destaque: true },
+  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number", destaque: true },
+] as const;
+
+// Campos adicionais para todas as linhas do Grupo 2 (L84 e L85) (em azul)
+const CAMPOS_ESPECIAIS_GRUPO2 = [
+  { name: "parametroPainel", label: "Parâmetro do Painel", type: "number", destaque: true },
+  { name: "acrisson", label: "Acrisson", type: "number", destaque: true },
+] as const;
+
 const CAMPOS_GRUPO2 = [
   { name: "velocidadeLinha", label: "Velocidade da Linha", type: "number" },
   { name: "waistPacker", label: "Waist Packer", type: "number" },
@@ -54,21 +66,10 @@ const CAMPOS_GRUPO2 = [
   { name: "matFix", label: "Mat Fix", type: "number" },
 ] as const;
 
-// Campos adicionais para todas as linhas do Grupo 2 (L84 e L85)
-const CAMPOS_ESPECIAIS_GRUPO2 = [
-  { name: "parametroPainel", label: "Parâmetro do Painel", type: "number" },
-  { name: "acrisson", label: "Acrisson", type: "number" },
-] as const;
-
-const CAMPOS_FINAIS_GRUPO2 = [
-  { name: "sku", label: "SKU", type: "text" },
-  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number" },
-] as const;
-
 const todosOsCamposGrupo2 = [
-  ...CAMPOS_GRUPO2,
+  ...CAMPOS_INICIAIS_GRUPO2,
   ...CAMPOS_ESPECIAIS_GRUPO2,
-  ...CAMPOS_FINAIS_GRUPO2,
+  ...CAMPOS_GRUPO2,
 ];
 
 export default function FormularioGrupo2({
@@ -223,7 +224,7 @@ export default function FormularioGrupo2({
                 name={campo.name as any}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-medium">
+                    <FormLabel className={`text-xs font-medium ${"destaque" in campo && campo.destaque ? "text-blue-600 dark:text-blue-400" : ""}`}>
                       {campo.label}
                     </FormLabel>
                     <FormControl>

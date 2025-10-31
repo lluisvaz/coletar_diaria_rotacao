@@ -27,6 +27,18 @@ interface FormularioGrupo1Props {
   onSalvarSucesso?: () => void;
 }
 
+// Campos iniciais (em azul)
+const CAMPOS_INICIAIS = [
+  { name: "sku", label: "SKU", type: "text", destaque: true },
+  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number", destaque: true },
+] as const;
+
+// Campos adicionais apenas para L80, L81, L82, L83, L84, L85 (em azul)
+const CAMPOS_ESPECIAIS_L80_L85 = [
+  { name: "parametroPainel", label: "Parâmetro do Painel", type: "number", destaque: true },
+  { name: "acrisson", label: "Acrisson", type: "number", destaque: true },
+] as const;
+
 const CAMPOS_GRUPO1 = [
   { name: "velocidadeLinha", label: "Velocidade da Linha", type: "number" },
   { name: "coreAttach", label: "Core Attach", type: "number" },
@@ -46,17 +58,6 @@ const CAMPOS_GRUPO1 = [
   { name: "release", label: "Release", type: "number" },
   { name: "tapeOnBag", label: "Tape on Bag", type: "number" },
   { name: "filme1x1", label: "Filme 1x1", type: "number" },
-] as const;
-
-// Campos adicionais apenas para L80, L81, L82, L83
-const CAMPOS_ESPECIAIS_L80_L83 = [
-  { name: "parametroPainel", label: "Parâmetro do Painel", type: "number" },
-  { name: "acrisson", label: "Acrisson", type: "number" },
-] as const;
-
-const CAMPOS_FINAIS = [
-  { name: "sku", label: "SKU", type: "text" },
-  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number" },
 ] as const;
 
 // Linhas que devem ter os campos especiais
@@ -183,9 +184,9 @@ export default function FormularioGrupo1({
   };
 
   const todosOsCampos = [
+    ...CAMPOS_INICIAIS,
+    ...(temCamposEspeciais ? CAMPOS_ESPECIAIS_L80_L85 : []),
     ...CAMPOS_GRUPO1,
-    ...(temCamposEspeciais ? CAMPOS_ESPECIAIS_L80_L83 : []),
-    ...CAMPOS_FINAIS,
   ];
 
   if (isLoading) {
@@ -218,7 +219,7 @@ export default function FormularioGrupo1({
                 name={campo.name as any}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-medium">
+                    <FormLabel className={`text-xs font-medium ${"destaque" in campo && campo.destaque ? "text-blue-600 dark:text-blue-400" : ""}`}>
                       {campo.label}
                     </FormLabel>
                     <FormControl>

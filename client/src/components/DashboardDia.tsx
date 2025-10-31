@@ -272,7 +272,7 @@ export default function DashboardDia({
         ws.mergeCells("D3:E3");
         ws.getCell("E3").value = mes;
 
-        // Headers para Grupo 1 - SKU e Peso Sacola vêm depois com 3 colunas de diferença
+        // Headers para Grupo 1 - SKU e Peso Sacola vêm antes de Parâmetro do Painel e Acrisson
         const headers = [
           "",
           "VELOCIDADE\nDA LINHA",
@@ -293,11 +293,10 @@ export default function DashboardDia({
           "RELEASE",
           "TAPE ON\nBAG",
           "FILME 1X1",
-          "PARÂMETRO\nDO PAINEL",
-          "ACRISSON",
-          "",
           "SKU",
           "PESO SACOLA\nVARPE",
+          "PARÂMETRO\nDO PAINEL",
+          "ACRISSON",
         ];
 
         const headerRow = ws.getRow(4);
@@ -336,11 +335,10 @@ export default function DashboardDia({
             coleta.release,
             coleta.tapeOnBag,
             coleta.filme1x1,
-            temCamposEspeciais ? coleta.parametroPainel : "",
-            temCamposEspeciais ? coleta.acrisson : "",
-            "",
             coleta.sku,
             coleta.pesoSacolaVarpe,
+            temCamposEspeciais ? coleta.parametroPainel : "",
+            temCamposEspeciais ? coleta.acrisson : "",
           ];
 
           values.forEach((value, colIdx) => {
@@ -348,8 +346,8 @@ export default function DashboardDia({
             cell.value = value;
             cell.style = estiloDados;
             // Formatar números com 2 casas decimais
-            if (typeof value === "number" && colIdx !== 22) {
-              // Não formatar SKU
+            if (typeof value === "number" && colIdx !== 19) {
+              // Não formatar SKU (coluna 19 agora)
               cell.numFmt = "0.00";
             }
           });
@@ -382,11 +380,10 @@ export default function DashboardDia({
             "CORE\nWRAP",
             "CORE\nWRAP SIDE\nSEAL",
             "MAT FIX",
-            "PARÂMETRO\nDO PAINEL",
-            "ACRISSON",
-            "",
             "SKU",
             "PESO SACOLA\nVARPE",
+            "PARÂMETRO\nDO PAINEL",
+            "ACRISSON",
           ];
 
           const headerRowGrupo2 = ws.getRow(startRowGrupo2 - 1);
@@ -424,11 +421,10 @@ export default function DashboardDia({
               coleta.coreWrap,
               coleta.coreWrapSeal,
               coleta.matFix,
-              coleta.parametroPainel,
-              coleta.acrisson,
-              "",
               coleta.sku,
               coleta.pesoSacolaVarpe,
+              coleta.parametroPainel,
+              coleta.acrisson,
             ];
 
             values.forEach((value, colIdx) => {
@@ -436,8 +432,8 @@ export default function DashboardDia({
               cell.value = value;
               cell.style = estiloDados;
               // Formatar números com 2 casas decimais
-              if (typeof value === "number" && colIdx !== 24) {
-                // Não formatar SKU
+              if (typeof value === "number" && colIdx !== 21) {
+                // Não formatar SKU (coluna 21 agora para Grupo 2)
                 cell.numFmt = "0.00";
               }
             });
@@ -465,11 +461,10 @@ export default function DashboardDia({
           12, // Release / Out Side Back Film Fix (Q)
           13, // Tape on Bag / Topsheet Fix (R)
           13, // Filme 1x1 / Core Wrap (S)
-          16, // Parâmetro do Painel / Core Wrap Side Seal (T)
-          13, // Acrisson / Mat Fix (U)
-          3, // Espaço vazio (V)
-          15, // SKU (W)
-          15, // Peso Sacola Varpe (X)
+          15, // SKU (T)
+          15, // Peso Sacola Varpe (U)
+          16, // Parâmetro do Painel (V)
+          13, // Acrisson (W)
         ];
 
         columnWidths.forEach((width, idx) => {
