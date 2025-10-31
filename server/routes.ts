@@ -1,13 +1,60 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertColetaGrupo1Schema, insertColetaGrupo2Schema } from "@shared/schema";
 import { z } from "zod";
 import { formatInTimeZone } from "date-fns-tz";
 
+const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+  if (req.session.authenticated) {
+    next();
+  } else {
+    res.status(401).json({ error: "Não autenticado" });
+  }
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // POST /api/auth/verify - Verifica o código de acesso
+  app.post("/api/auth/verify", async (req, res) => {
+    try {
+      const { code } = req.body;
+      if (!code) {
+        res.status(400).json({ error: "Código de acesso não fornecido" });
+        return;
+      }
+      
+      const isValid = await storage.verifyAccessCode(code);
+      
+      if (isValid) {
+        req.session.authenticated = true;
+        res.json({ success: true });
+      } else {
+        res.status(401).json({ error: "Código de acesso inválido" });
+      }
+    } catch (error) {
+      console.error("Erro ao verificar código de acesso:", error);
+      res.status(500).json({ error: "Erro ao verificar código" });
+    }
+  });
+
+  // GET /api/auth/status - Verifica se está autenticado
+  app.get("/api/auth/status", async (req, res) => {
+    res.json({ authenticated: !!req.session.authenticated });
+  });
+
+  // POST /api/auth/logout - Faz logout
+  app.post("/api/auth/logout", async (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        res.status(500).json({ error: "Erro ao fazer logout" });
+      } else {
+        res.json({ success: true });
+      }
+    });
+  });
+
   // GET /api/coleta/grupo1 - Retorna todas as coletas do Grupo 1
-  app.get("/api/coleta/grupo1", async (_req, res) => {
+  app.get("/api/coleta/grupo1", requireAuth, async (_req, res) => {
     try {
       const coletas = await storage.getColetasGrupo1();
       res.json(coletas);
@@ -18,7 +65,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/coleta/grupo2 - Retorna todas as coletas do Grupo 2
-  app.get("/api/coleta/grupo2", async (_req, res) => {
+  app.get("/api/coleta/grupo2", requireAuth, async (_req, res) => {
     try {
       const coletas = await storage.getColetasGrupo2();
       res.json(coletas);
@@ -29,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/coleta/grupo1 - Salva uma nova coleta do Grupo 1
-  app.post("/api/coleta/grupo1", async (req, res) => {
+  app.post("/api/coleta/grupo1", requireAuth, async (req, res) => {
     try {
       const validatedData = insertColetaGrupo1Schema.parse(req.body);
       
@@ -67,7 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/coleta/grupo2 - Salva uma nova coleta do Grupo 2
-  app.post("/api/coleta/grupo2", async (req, res) => {
+  app.post("/api/coleta/grupo2", requireAuth, async (req, res) => {
     try {
       const validatedData = insertColetaGrupo2Schema.parse(req.body);
       
@@ -105,7 +152,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT /api/coleta/grupo1/:id - Atualiza uma coleta do Grupo 1
-  app.put("/api/coleta/grupo1/:id", async (req, res) => {
+  app.put("/api/coleta/grupo1/:id", requireAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const validatedData = insertColetaGrupo1Schema.partial().parse(req.body);
@@ -131,7 +178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT /api/coleta/grupo2/:id - Atualiza uma coleta do Grupo 2
-  app.put("/api/coleta/grupo2/:id", async (req, res) => {
+  app.put("/api/coleta/grupo2/:id", requireAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const validatedData = insertColetaGrupo2Schema.partial().parse(req.body);
@@ -157,7 +204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // DELETE /api/coleta/grupo1/:id - Remove uma coleta do Grupo 1
-  app.delete("/api/coleta/grupo1/:id", async (req, res) => {
+  app.delete("/api/coleta/grupo1/:id", requireAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteColetaGrupo1(id);
@@ -175,7 +222,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // DELETE /api/coleta/grupo2/:id - Remove uma coleta do Grupo 2
-  app.delete("/api/coleta/grupo2/:id", async (req, res) => {
+  app.delete("/api/coleta/grupo2/:id", requireAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteColetaGrupo2(id);

@@ -4,6 +4,10 @@
 
 An industrial data collection web application designed to replace manual Excel spreadsheet entry for daily Nordson pump rotation data collection. The system manages production line data across multiple manufacturing lines (L80-L94), with distinct data schemas based on line groupings. Built with a focus on efficiency, data accuracy, and industrial workplace usability, all interface elements are presented in Portuguese (Brazil).
 
+**Authentication:** The application requires authentication via a universal access code (default: UFHPC@2025) before accessing any features.
+
+**Navigation:** The system features a quick access home page with three modules: Rotação de Bombas (active), Gramatura Semanal (coming soon), and Controle 5S (coming soon).
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -31,7 +35,10 @@ Preferred communication style: Simple, everyday language.
 - Form state managed by React Hook Form
 
 **Key Design Decisions:**
-- Single-page application with tab-based navigation (Data Entry / Dashboard)
+- Authentication-first application flow with protected routes
+- Quick access home page with module cards for future expansion
+- Sidebar navigation (Mantine-style) appears when accessing specific modules
+- Tab-based navigation within modules (Data Entry / Dashboard)
 - Two separate form components (FormularioGrupo1, FormularioGrupo2) to handle different production line data schemas
 - Mobile-responsive design with custom breakpoint detection hook
 - ExcelJS library for complex Excel export functionality with custom formatting
@@ -66,7 +73,11 @@ Preferred communication style: Simple, everyday language.
 **Database Schema:**
 - PostgreSQL as the primary database (via Neon serverless)
 - Drizzle ORM for type-safe database operations and migrations
-- Two distinct tables reflecting business logic requirements:
+- Three distinct tables:
+
+**Table: auth_config** (Authentication configuration)
+- Stores the universal access code for application authentication
+- Single row table with id and access_code fields
 
 **Table 1: coleta_grupo1** (Lines L90, L91, L92, L93, L94, L80, L81, L82, L83)
 - 18 pump measurement columns plus metadata

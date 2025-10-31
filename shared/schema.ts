@@ -3,6 +3,11 @@ import { pgTable, text, varchar, real, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const authConfig = pgTable("auth_config", {
+  id: integer("id").primaryKey().default(1),
+  accessCode: text("access_code").notNull(),
+});
+
 export const coletaGrupo1 = pgTable("coleta_grupo1", {
   id: integer("id").primaryKey(),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
@@ -73,6 +78,12 @@ export const insertColetaGrupo2Schema = createInsertSchema(coletaGrupo2).omit({
   createdAt: true,
 });
 
+export const insertAuthConfigSchema = createInsertSchema(authConfig).omit({
+  id: true,
+});
+
+export type InsertAuthConfig = z.infer<typeof insertAuthConfigSchema>;
+export type AuthConfig = typeof authConfig.$inferSelect;
 export type InsertColetaGrupo1 = z.infer<typeof insertColetaGrupo1Schema>;
 export type InsertColetaGrupo2 = z.infer<typeof insertColetaGrupo2Schema>;
 export type ColetaGrupo1 = typeof coletaGrupo1.$inferSelect;

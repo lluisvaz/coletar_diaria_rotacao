@@ -2,10 +2,13 @@ import {
   type ColetaGrupo1, 
   type ColetaGrupo2, 
   type InsertColetaGrupo1, 
-  type InsertColetaGrupo2 
+  type InsertColetaGrupo2,
+  type AuthConfig 
 } from "@shared/schema";
 
 export interface IStorage {
+  getAccessCode(): Promise<string>;
+  verifyAccessCode(code: string): Promise<boolean>;
   getColetasGrupo1(): Promise<ColetaGrupo1[]>;
   getColetasGrupo2(): Promise<ColetaGrupo2[]>;
   getColetaGrupo1(id: number): Promise<ColetaGrupo1 | undefined>;
@@ -19,16 +22,26 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
+  private accessCode: string;
   private coletasGrupo1: Map<number, ColetaGrupo1>;
   private coletasGrupo2: Map<number, ColetaGrupo2>;
   private nextIdGrupo1: number;
   private nextIdGrupo2: number;
 
   constructor() {
+    this.accessCode = "UFHPC@2025";
     this.coletasGrupo1 = new Map();
     this.coletasGrupo2 = new Map();
     this.nextIdGrupo1 = 1;
     this.nextIdGrupo2 = 1;
+  }
+
+  async getAccessCode(): Promise<string> {
+    return this.accessCode;
+  }
+
+  async verifyAccessCode(code: string): Promise<boolean> {
+    return code === this.accessCode;
   }
 
   async getColetasGrupo1(): Promise<ColetaGrupo1[]> {
@@ -70,6 +83,8 @@ export class MemStorage implements IStorage {
       ...insertColeta,
       sku: insertColeta.sku || '',
       pesoSacolaVarpe: insertColeta.pesoSacolaVarpe || 0,
+      parametroPainel: insertColeta.parametroPainel ?? null,
+      acrisson: insertColeta.acrisson ?? null,
       id,
       createdAt: new Date().toISOString(),
     };
@@ -92,6 +107,8 @@ export class MemStorage implements IStorage {
       ...insertColeta,
       sku: insertColeta.sku || '',
       pesoSacolaVarpe: insertColeta.pesoSacolaVarpe || 0,
+      parametroPainel: insertColeta.parametroPainel ?? null,
+      acrisson: insertColeta.acrisson ?? null,
       id,
       createdAt: new Date().toISOString(),
     };
