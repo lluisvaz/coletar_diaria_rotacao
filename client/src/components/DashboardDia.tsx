@@ -76,7 +76,11 @@ export default function DashboardDia({
       apiRequest("PUT", `/api/coleta/grupo1/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
-      toast({ title: "Sucesso!", description: "Registro atualizado.", variant: "success" });
+      toast({
+        title: "Sucesso!",
+        description: "Registro atualizado.",
+        variant: "success",
+      });
       setModalEdicaoAberto(false);
       setEditandoId(null);
       setEditandoGrupo(null);
@@ -96,7 +100,11 @@ export default function DashboardDia({
       apiRequest("PUT", `/api/coleta/grupo2/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo2"] });
-      toast({ title: "Sucesso!", description: "Registro atualizado.", variant: "success" });
+      toast({
+        title: "Sucesso!",
+        description: "Registro atualizado.",
+        variant: "success",
+      });
       setModalEdicaoAberto(false);
       setEditandoId(null);
       setEditandoGrupo(null);
@@ -116,7 +124,11 @@ export default function DashboardDia({
       apiRequest("DELETE", `/api/coleta/grupo1/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo1"] });
-      toast({ title: "Sucesso!", description: "Registro excluído.", variant: "success" });
+      toast({
+        title: "Sucesso!",
+        description: "Registro excluído.",
+        variant: "success",
+      });
     },
     onError: () => {
       toast({
@@ -132,7 +144,11 @@ export default function DashboardDia({
       apiRequest("DELETE", `/api/coleta/grupo2/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/coleta/grupo2"] });
-      toast({ title: "Sucesso!", description: "Registro excluído.", variant: "success" });
+      toast({
+        title: "Sucesso!",
+        description: "Registro excluído.",
+        variant: "success",
+      });
     },
     onError: () => {
       toast({
@@ -178,8 +194,9 @@ export default function DashboardDia({
       },
       {
         title: "Excluir registro?",
-        description: "Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.",
-      }
+        description:
+          "Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.",
+      },
     );
   };
 
@@ -505,7 +522,7 @@ export default function DashboardDia({
         {grupo1Ordenado.length > 0 && (
           <div>
             <h4 className="text-sm font-medium mb-2">
-              Absorventes e Fraldas Tape
+              ABS e Tape
             </h4>
             <div className="rounded-md border overflow-x-auto">
               <Table>
@@ -752,7 +769,7 @@ export default function DashboardDia({
         {/* Grupo 2 - L.84 e L.85 */}
         {grupo2Ordenado.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium mb-2">Fraldas Pants</h4>
+            <h4 className="text-sm font-medium mb-2">Pants</h4>
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -1022,7 +1039,6 @@ export default function DashboardDia({
 
       {ConfirmerDialog}
 
-
       {isMobile ? (
         <Drawer open={modalEdicaoAberto} onOpenChange={setModalEdicaoAberto}>
           <DrawerContent className="max-h-[85vh]">
@@ -1041,11 +1057,27 @@ export default function DashboardDia({
               </div>
               <DrawerFooter className="px-4 pt-4 pb-4 border-t">
                 <div className="flex gap-2 w-full">
-                  <Button variant="outline" onClick={cancelarEdicao} data-testid="button-cancel-edit" className="flex-1">
+                  <Button
+                    variant="outline"
+                    onClick={cancelarEdicao}
+                    data-testid="button-cancel-edit"
+                    className="flex-1"
+                  >
                     Cancelar
                   </Button>
-                  <Button onClick={salvarEdicao} disabled={updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending} data-testid="button-save-edit" className="flex-1">
-                    {updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending ? "Salvando..." : "Salvar"}
+                  <Button
+                    onClick={salvarEdicao}
+                    disabled={
+                      updateGrupo1Mutation.isPending ||
+                      updateGrupo2Mutation.isPending
+                    }
+                    data-testid="button-save-edit"
+                    className="flex-1"
+                  >
+                    {updateGrupo1Mutation.isPending ||
+                    updateGrupo2Mutation.isPending
+                      ? "Salvando..."
+                      : "Salvar"}
                   </Button>
                 </div>
               </DrawerFooter>
@@ -1068,11 +1100,25 @@ export default function DashboardDia({
               )}
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={cancelarEdicao} data-testid="button-cancel-edit">
+              <Button
+                variant="outline"
+                onClick={cancelarEdicao}
+                data-testid="button-cancel-edit"
+              >
                 Cancelar
               </Button>
-              <Button onClick={salvarEdicao} disabled={updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending} data-testid="button-save-edit">
-                {updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending ? "Salvando..." : "Salvar"}
+              <Button
+                onClick={salvarEdicao}
+                disabled={
+                  updateGrupo1Mutation.isPending ||
+                  updateGrupo2Mutation.isPending
+                }
+                data-testid="button-save-edit"
+              >
+                {updateGrupo1Mutation.isPending ||
+                updateGrupo2Mutation.isPending
+                  ? "Salvando..."
+                  : "Salvar"}
               </Button>
             </DialogFooter>
           </DialogContent>
