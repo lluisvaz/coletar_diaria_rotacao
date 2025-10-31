@@ -165,17 +165,17 @@ export default function Dashboard() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4">
           <div>
             <CardTitle>Dashboard de Coletas</CardTitle>
             <CardDescription>
               Selecione um dia para visualizar e exportar os dados
             </CardDescription>
           </div>
-          <div className="flex gap-2 items-center">
-            <Filter className="h-4 w-4 text-muted-foreground" />
+          <div className="flex gap-2 items-center max-w-md">
+            <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <Select value={filtro} onValueChange={(value: any) => setFiltro(value)}>
-              <SelectTrigger className="w-[180px]" data-testid="select-filtro">
+              <SelectTrigger className="w-full" data-testid="select-filtro">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -188,7 +188,7 @@ export default function Dashboard() {
             {filtro === "dia" && (
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="flex-shrink-0">
                     {diaEspecifico ? format(diaEspecifico, "dd/MM/yyyy") : "Selecionar"}
                   </Button>
                 </PopoverTrigger>

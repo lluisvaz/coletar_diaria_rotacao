@@ -62,36 +62,18 @@ export default function FormularioDeEntrada() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="data-coleta">Data da Coleta</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id="data-coleta"
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !dataColeta && "text-muted-foreground",
-                  )}
-                  data-testid="button-data-coleta"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dataColeta ? (
-                    format(dataColeta, "PPP", { locale: ptBR })
-                  ) : (
-                    <span>Selecione a data</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dataColeta}
-                  onSelect={(date) => date && setDataColeta(date)}
-                  initialFocus
-                  locale={ptBR}
-                  data-testid="calendar-data-coleta"
-                />
-              </PopoverContent>
-            </Popover>
+            <Button
+              id="data-coleta"
+              variant="outline"
+              disabled
+              className={cn(
+                "w-full justify-start text-left font-normal opacity-60 cursor-not-allowed",
+              )}
+              data-testid="button-data-coleta"
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {format(dataColeta, "PPP", { locale: ptBR })}
+            </Button>
           </div>
 
           <div className="space-y-2">
