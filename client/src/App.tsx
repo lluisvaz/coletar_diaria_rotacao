@@ -12,7 +12,7 @@ import MobileHeader from "@/components/MobileHeader";
 
 function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
-  const showNavigation = location !== "/login" && location !== "/home";
+  const showNavigation = location !== "/login";
 
   return (
     <>

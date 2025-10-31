@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Droplet, Scale, CheckSquare } from "lucide-react";
 
 const quickAccessCards = [
@@ -61,7 +61,7 @@ export default function QuickAccess() {
                 onClick={() => handleCardClick(card)}
                 data-testid={`card-${card.id}`}
               >
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-4">
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -90,11 +90,6 @@ export default function QuickAccess() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <CardDescription className="text-sm" data-testid={`text-description-${card.id}`}>
-                    {card.description}
-                  </CardDescription>
-                </CardContent>
               </Card>
             );
           })}

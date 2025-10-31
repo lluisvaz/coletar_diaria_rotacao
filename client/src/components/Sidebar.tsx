@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Home, BarChart3, LogOut, Droplet } from "lucide-react";
+import { Home, LogOut, Droplet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -12,9 +12,8 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { icon: Home, label: "Acesso Rápido", route: "/home" },
+  { icon: Home, label: "Início", route: "/home" },
   { icon: Droplet, label: "Rotação de Bombas", route: "/" },
-  { icon: BarChart3, label: "Dashboard", route: "/dashboard" },
 ];
 
 export default function Sidebar() {

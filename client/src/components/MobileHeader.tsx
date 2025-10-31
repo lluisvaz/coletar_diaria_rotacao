@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Menu, X, Home, BarChart3, LogOut, Droplet } from "lucide-react";
+import { Menu, Home, LogOut, Droplet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const navLinks = [
-  { icon: Home, label: "Acesso Rápido", route: "/home" },
+  { icon: Home, label: "Início", route: "/home" },
   { icon: Droplet, label: "Rotação de Bombas", route: "/" },
-  { icon: BarChart3, label: "Dashboard", route: "/dashboard" },
 ];
 
 export default function MobileHeader() {
@@ -81,9 +80,6 @@ export default function MobileHeader() {
           </nav>
         </SheetContent>
       </Sheet>
-      <div className="flex-1 text-center font-semibold text-gray-900 dark:text-white">
-        Sistema Personal Care
-      </div>
     </header>
   );
 }
