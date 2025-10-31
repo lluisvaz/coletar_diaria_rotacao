@@ -256,7 +256,7 @@ export default function DashboardDia({
 
       // Criar uma única aba com ambos os grupos
       if (grupo1.length > 0 || grupo2.length > 0) {
-        const ws = workbook.addWorksheet("ABS e Tape");
+        const ws = workbook.addWorksheet("Rotação de Bombas");
 
         ws.mergeCells("A1:V1");
         ws.getCell("A1").value = titulo;
@@ -346,8 +346,9 @@ export default function DashboardDia({
             cell.value = value;
             cell.style = estiloDados;
             // Formatar números com 2 casas decimais
-            if (typeof value === 'number' && colIdx !== 22) { // Não formatar SKU
-              cell.numFmt = '0.00';
+            if (typeof value === "number" && colIdx !== 22) {
+              // Não formatar SKU
+              cell.numFmt = "0.00";
             }
           });
         });
@@ -355,7 +356,7 @@ export default function DashboardDia({
         // Adicionar dados do Grupo 2 (L84 e L85) 5 linhas abaixo do Grupo 1
         if (grupo2.length > 0) {
           const startRowGrupo2 = 5 + grupo1.length + 5;
-          
+
           // Headers para Grupo 2
           const headersGrupo2 = [
             "",
@@ -433,8 +434,9 @@ export default function DashboardDia({
               cell.value = value;
               cell.style = estiloDados;
               // Formatar números com 2 casas decimais
-              if (typeof value === 'number' && colIdx !== 24) { // Não formatar SKU
-                cell.numFmt = '0.00';
+              if (typeof value === "number" && colIdx !== 24) {
+                // Não formatar SKU
+                cell.numFmt = "0.00";
               }
             });
           });
@@ -443,41 +445,42 @@ export default function DashboardDia({
         // Ajustar larguras das colunas de forma mais adequada ao conteúdo
         // Grupo 2 tem mais colunas (até 26), então precisamos definir larguras para todas
         const columnWidths = [
-          10,  // Linha (A)
-          14,  // Velocidade da Linha (B)
-          16,  // Core Attach / Waist Packer (C)
-          16,  // Core Wrap / ISG Elastic (D)
-          12,  // Surge / Waist Elastic (E)
-          12,  // Cuff End / ISG Side Seal (F)
-          12,  // Bead / Absorvent Fix (G)
-          16,  // Leg Elastic / Outer Edge (H)
-          16,  // Cuff Elastic / Inner (I)
-          13,  // Temporary / Bead (J)
-          14,  // Topsheet / Standing Gather (K)
-          14,  // Backsheet / Backfilm Fix (L)
-          12,  // Frontal / OSG Side Seal (M)
-          13,  // Ear Attach / OSG Elastico (N)
-          12,  // Pulp Fix / NW Seal Cont (O)
-          12,  // Central / NW Seal Int Cent (P)
-          12,  // Release / Out Side Back Film Fix (Q)
-          13,  // Tape on Bag / Topsheet Fix (R)
-          13,  // Filme 1x1 / Core Wrap (S)
-          3,   // Espaço vazio 1 / Core Wrap Side Seal (T)
-          3,   // Espaço vazio 2 / Mat Fix (U)
-          3,   // Espaço vazio 3 (V)
-          15,  // SKU (W)
-          15,  // Peso Sacola Varpe (X)
-          15,  // SKU Grupo 2 (Y)
-          15,  // Peso Sacola Varpe Grupo 2 (Z)
+          10, // Linha (A)
+          14, // Velocidade da Linha (B)
+          16, // Core Attach / Waist Packer (C)
+          16, // Core Wrap / ISG Elastic (D)
+          12, // Surge / Waist Elastic (E)
+          12, // Cuff End / ISG Side Seal (F)
+          12, // Bead / Absorvent Fix (G)
+          16, // Leg Elastic / Outer Edge (H)
+          16, // Cuff Elastic / Inner (I)
+          13, // Temporary / Bead (J)
+          14, // Topsheet / Standing Gather (K)
+          14, // Backsheet / Backfilm Fix (L)
+          12, // Frontal / OSG Side Seal (M)
+          13, // Ear Attach / OSG Elastico (N)
+          12, // Pulp Fix / NW Seal Cont (O)
+          12, // Central / NW Seal Int Cent (P)
+          12, // Release / Out Side Back Film Fix (Q)
+          13, // Tape on Bag / Topsheet Fix (R)
+          13, // Filme 1x1 / Core Wrap (S)
+          3, // Espaço vazio 1 / Core Wrap Side Seal (T)
+          3, // Espaço vazio 2 / Mat Fix (U)
+          3, // Espaço vazio 3 (V)
+          15, // SKU (W)
+          15, // Peso Sacola Varpe (X)
+          15, // SKU Grupo 2 (Y)
+          15, // Peso Sacola Varpe Grupo 2 (Z)
         ];
-        
+
         columnWidths.forEach((width, idx) => {
           ws.getColumn(idx + 1).width = width;
         });
 
         // Habilitar ajuste automático de altura para todas as linhas
         ws.eachRow((row, rowNumber) => {
-          if (rowNumber >= 4) { // Apenas para linhas de dados e cabeçalho
+          if (rowNumber >= 4) {
+            // Apenas para linhas de dados e cabeçalho
             row.eachCell((cell) => {
               // Garantir que wrapText esteja habilitado (já está no estilo, mas reforçando)
               if (cell.style.alignment) {
@@ -566,9 +569,7 @@ export default function DashboardDia({
         {/* Grupo 1 - L.90 até L.83 */}
         {grupo1Ordenado.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium mb-2">
-              ABS e Tape
-            </h4>
+            <h4 className="text-sm font-medium mb-2">ABS e Tape</h4>
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>

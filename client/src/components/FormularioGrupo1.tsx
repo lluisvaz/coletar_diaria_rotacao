@@ -28,8 +28,6 @@ interface FormularioGrupo1Props {
 }
 
 const CAMPOS_GRUPO1 = [
-  { name: "sku", label: "SKU", type: "text" },
-  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number" },
   { name: "velocidadeLinha", label: "Velocidade da Linha", type: "number" },
   { name: "coreAttach", label: "Core Attach", type: "number" },
   { name: "coreWrap", label: "Core Wrap", type: "number" },
@@ -50,6 +48,20 @@ const CAMPOS_GRUPO1 = [
   { name: "filme1x1", label: "Filme 1x1", type: "number" },
 ] as const;
 
+// Campos adicionais apenas para L80, L81, L82, L83
+const CAMPOS_ESPECIAIS_L80_L83 = [
+  { name: "parametroPainel", label: "Parâmetro do Painel", type: "number" },
+  { name: "acrisson", label: "Acrisson", type: "number" },
+] as const;
+
+const CAMPOS_FINAIS = [
+  { name: "sku", label: "SKU", type: "text" },
+  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number" },
+] as const;
+
+// Linhas que devem ter os campos especiais
+const LINHAS_COM_CAMPOS_ESPECIAIS = ["L80", "L81", "L82", "L83"];
+
 export default function FormularioGrupo1({
   dataColeta,
   linhaProducao,
@@ -61,6 +73,8 @@ export default function FormularioGrupo1({
     queryKey: ["/api/coleta/grupo1"],
   });
 
+  const temCamposEspeciais = LINHAS_COM_CAMPOS_ESPECIAIS.includes(linhaProducao);
+
   const form = useForm<InsertColetaGrupo1>({
     resolver: zodResolver(insertColetaGrupo1Schema),
     defaultValues: {
@@ -68,6 +82,8 @@ export default function FormularioGrupo1({
       linhaProducao,
       sku: "",
       pesoSacolaVarpe: 0,
+      parametroPainel: 0,
+      acrisson: 0,
       velocidadeLinha: 0,
       coreAttach: 0,
       coreWrap: 0,
@@ -103,6 +119,8 @@ export default function FormularioGrupo1({
         linhaProducao,
         sku: "",
         pesoSacolaVarpe: 0,
+        parametroPainel: 0,
+        acrisson: 0,
         velocidadeLinha: 0,
         coreAttach: 0,
         coreWrap: 0,
@@ -164,11 +182,17 @@ export default function FormularioGrupo1({
     mutation.mutate({ ...data, dataColeta, linhaProducao });
   };
 
+  const todosOsCampos = [
+    ...CAMPOS_GRUPO1,
+    ...(temCamposEspeciais ? CAMPOS_ESPECIAIS_L80_L83 : []),
+    ...CAMPOS_FINAIS,
+  ];
+
   if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {CAMPOS_GRUPO1.map((campo) => (
+          {todosOsCampos.map((campo) => (
             <div key={campo.name} className="space-y-2">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-8 w-full" />
@@ -187,7 +211,7 @@ export default function FormularioGrupo1({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {CAMPOS_GRUPO1.map((campo) => (
+            {todosOsCampos.map((campo) => (
               <FormField
                 key={campo.name}
                 control={form.control}

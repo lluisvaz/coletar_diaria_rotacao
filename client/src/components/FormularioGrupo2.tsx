@@ -28,8 +28,6 @@ interface FormularioGrupo2Props {
 }
 
 const CAMPOS_GRUPO2 = [
-  { name: "sku", label: "SKU", type: "text" },
-  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number" },
   { name: "velocidadeLinha", label: "Velocidade da Linha", type: "number" },
   { name: "waistPacker", label: "Waist Packer", type: "number" },
   { name: "isgElastic", label: "ISG Elastic", type: "number" },
@@ -56,6 +54,23 @@ const CAMPOS_GRUPO2 = [
   { name: "matFix", label: "Mat Fix", type: "number" },
 ] as const;
 
+// Campos adicionais para todas as linhas do Grupo 2 (L84 e L85)
+const CAMPOS_ESPECIAIS_GRUPO2 = [
+  { name: "parametroPainel", label: "Parâmetro do Painel", type: "number" },
+  { name: "acrisson", label: "Acrisson", type: "number" },
+] as const;
+
+const CAMPOS_FINAIS_GRUPO2 = [
+  { name: "sku", label: "SKU", type: "text" },
+  { name: "pesoSacolaVarpe", label: "Peso da Sacola na Varpe", type: "number" },
+] as const;
+
+const todosOsCamposGrupo2 = [
+  ...CAMPOS_GRUPO2,
+  ...CAMPOS_ESPECIAIS_GRUPO2,
+  ...CAMPOS_FINAIS_GRUPO2,
+];
+
 export default function FormularioGrupo2({
   dataColeta,
   linhaProducao,
@@ -74,6 +89,8 @@ export default function FormularioGrupo2({
       linhaProducao,
       sku: "",
       pesoSacolaVarpe: 0,
+      parametroPainel: 0,
+      acrisson: 0,
       velocidadeLinha: 0,
       waistPacker: 0,
       isgElastic: 0,
@@ -111,6 +128,8 @@ export default function FormularioGrupo2({
         linhaProducao,
         sku: "",
         pesoSacolaVarpe: 0,
+        parametroPainel: 0,
+        acrisson: 0,
         velocidadeLinha: 0,
         waistPacker: 0,
         isgElastic: 0,
@@ -178,7 +197,7 @@ export default function FormularioGrupo2({
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {CAMPOS_GRUPO2.map((campo) => (
+          {todosOsCamposGrupo2.map((campo) => (
             <div key={campo.name} className="space-y-2">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-8 w-full" />
@@ -197,7 +216,7 @@ export default function FormularioGrupo2({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {CAMPOS_GRUPO2.map((campo) => (
+            {todosOsCamposGrupo2.map((campo) => (
               <FormField
                 key={campo.name}
                 control={form.control}
