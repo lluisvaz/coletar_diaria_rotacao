@@ -37,14 +37,14 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md" data-testid="card-login">
         <CardHeader className="space-y-1 text-center">
           <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-2">
             <Lock className="w-6 h-6 text-primary-foreground" />
           </div>
           <CardTitle className="text-2xl font-bold" data-testid="text-title">
-            Rotação de Bombas - Personal Care
+            Sistema Personal Care
           </CardTitle>
           <CardDescription data-testid="text-description">
             Digite o código de acesso para continuar

@@ -35,7 +35,7 @@ export default function Sidebar() {
 
   return (
     <TooltipProvider>
-      <nav className="fixed left-0 top-0 h-screen w-16 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col items-center py-4 z-50">
+      <nav className="hidden lg:flex fixed left-0 top-0 h-screen w-16 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-col items-center py-4 z-50">
         <div className="mb-8 w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
           <Droplet className="w-6 h-6 text-primary-foreground" />
         </div>

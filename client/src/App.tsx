@@ -8,15 +8,21 @@ import Login from "@/pages/login";
 import QuickAccess from "@/pages/quick-access";
 import NotFound from "@/pages/not-found";
 import Sidebar from "@/components/Sidebar";
+import MobileHeader from "@/components/MobileHeader";
 
 function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
-  const showSidebar = location !== "/login" && location !== "/home";
+  const showNavigation = location !== "/login" && location !== "/home";
 
   return (
     <>
-      {showSidebar && <Sidebar />}
-      <div className={showSidebar ? "ml-16" : ""}>
+      {showNavigation && (
+        <>
+          <Sidebar />
+          <MobileHeader />
+        </>
+      )}
+      <div className={showNavigation ? "lg:ml-16 pt-14 lg:pt-0" : ""}>
         {children}
       </div>
     </>

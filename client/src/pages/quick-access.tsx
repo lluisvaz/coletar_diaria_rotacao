@@ -39,13 +39,13 @@ export default function QuickAccess() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8" data-testid="text-title">
-          Acesso Rápido
+    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center p-4">
+      <div className="max-w-2xl w-full">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 text-center" data-testid="text-title">
+          Bem-vindo
         </h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4">
           {quickAccessCards.map((card) => {
             const Icon = card.icon;
             const isDisabled = !card.enabled;
@@ -56,22 +56,22 @@ export default function QuickAccess() {
                 className={`transition-all duration-200 ${
                   isDisabled
                     ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer hover:shadow-lg hover:scale-105"
+                    : "cursor-pointer hover:shadow-md"
                 }`}
                 onClick={() => handleCardClick(card)}
                 data-testid={`card-${card.id}`}
               >
-                <CardHeader>
-                  <div className="flex items-center gap-4">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
                     <div
-                      className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                         isDisabled
-                          ? "bg-gray-300 dark:bg-gray-700"
+                          ? "bg-gray-200 dark:bg-gray-700"
                           : "bg-primary"
                       }`}
                     >
                       <Icon
-                        className={`w-6 h-6 ${
+                        className={`w-5 h-5 ${
                           isDisabled
                             ? "text-gray-500 dark:text-gray-400"
                             : "text-primary-foreground"
@@ -79,7 +79,7 @@ export default function QuickAccess() {
                       />
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-xl" data-testid={`text-title-${card.id}`}>
+                      <CardTitle className="text-base" data-testid={`text-title-${card.id}`}>
                         {card.title}
                       </CardTitle>
                       {isDisabled && (
@@ -90,8 +90,8 @@ export default function QuickAccess() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <CardDescription data-testid={`text-description-${card.id}`}>
+                <CardContent className="pt-0">
+                  <CardDescription className="text-sm" data-testid={`text-description-${card.id}`}>
                     {card.description}
                   </CardDescription>
                 </CardContent>
