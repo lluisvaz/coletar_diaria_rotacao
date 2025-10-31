@@ -16,6 +16,7 @@ import DashboardDia from "./DashboardDia";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useConfirmer } from "@/components/ui/confirmer";
 import {
   Select,
   SelectContent,
@@ -38,6 +39,7 @@ export default function Dashboard() {
   const [filtro, setFiltro] = useState<"todos" | "semana" | "mes" | "dia">("todos");
   const [diaEspecifico, setDiaEspecifico] = useState<Date | undefined>(undefined);
   const { toast } = useToast();
+  const { confirm, ConfirmerDialog } = useConfirmer();
 
   const { data: grupo1Data, isLoading: isLoadingGrupo1 } = useQuery<
     ColetaGrupo1[]
@@ -75,8 +77,13 @@ export default function Dashboard() {
 
   const excluirDia = (data: string, event: React.MouseEvent) => {
     event.stopPropagation();
-    if (!confirm(`Tem certeza que deseja excluir TODOS os registros do dia ${format(parseISO(data), "dd/MM/yyyy", { locale: ptBR })}?`)) return;
-    deleteDiaMutation.mutate(data);
+    confirm(
+      () => deleteDiaMutation.mutate(data),
+      {
+        title: "Excluir todos os registros do dia?",
+        description: `Tem certeza que deseja excluir TODOS os registros do dia ${format(parseISO(data), "dd/MM/yyyy", { locale: ptBR })}? Esta ação não pode ser desfeita.`,
+      }
+    );
   };
 
   // Agrupar coletas por dia
@@ -163,19 +170,21 @@ export default function Dashboard() {
   const isLoading = isLoadingGrupo1 || isLoadingGrupo2;
 
   return (
-    <Card>
+    <>
+      {ConfirmerDialog}
+      <Card>
       <CardHeader>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <CardTitle>Dashboard de Coletas</CardTitle>
             <CardDescription>
               Selecione um dia para visualizar e exportar os dados
             </CardDescription>
           </div>
-          <div className="flex gap-2 items-center max-w-md">
+          <div className="flex gap-2 items-center max-w-md md:max-w-none">
             <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <Select value={filtro} onValueChange={(value: any) => setFiltro(value)}>
-              <SelectTrigger className="w-full" data-testid="select-filtro">
+              <SelectTrigger className="w-full md:w-[180px]" data-testid="select-filtro">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -294,5 +303,6 @@ export default function Dashboard() {
         )}
       </CardContent>
     </Card>
+    </>
   );
 }

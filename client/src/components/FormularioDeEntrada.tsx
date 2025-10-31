@@ -27,6 +27,8 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import FormularioGrupo1 from "./FormularioGrupo1";
 import FormularioGrupo2 from "./FormularioGrupo2";
+import { useQuery } from "@tanstack/react-query";
+import { type ColetaGrupo1, type ColetaGrupo2 } from "@shared/schema";
 
 const LINHAS_GRUPO1 = [
   "L90",
@@ -49,6 +51,28 @@ export default function FormularioDeEntrada() {
 
   const isGrupo1 = LINHAS_GRUPO1.includes(linhaProducao);
   const isGrupo2 = LINHAS_GRUPO2.includes(linhaProducao);
+
+  const { data: grupo1Data } = useQuery<ColetaGrupo1[]>({
+    queryKey: ["/api/coleta/grupo1"],
+  });
+
+  const { data: grupo2Data } = useQuery<ColetaGrupo2[]>({
+    queryKey: ["/api/coleta/grupo2"],
+  });
+
+  const dataColetaFormatada = format(dataColeta, "yyyy-MM-dd");
+  
+  const linhasRegistradas = new Set<string>();
+  grupo1Data?.forEach((coleta) => {
+    if (coleta.dataColeta === dataColetaFormatada) {
+      linhasRegistradas.add(coleta.linhaProducao);
+    }
+  });
+  grupo2Data?.forEach((coleta) => {
+    if (coleta.dataColeta === dataColetaFormatada) {
+      linhasRegistradas.add(coleta.linhaProducao);
+    }
+  });
 
   return (
     <Card>
@@ -90,9 +114,10 @@ export default function FormularioDeEntrada() {
                   <SelectItem
                     key={linha}
                     value={linha}
+                    disabled={linhasRegistradas.has(linha)}
                     data-testid={`option-linha-${linha}`}
                   >
-                    {linha}
+                    {linha} {linhasRegistradas.has(linha) && "(já registrado)"}
                   </SelectItem>
                 ))}
               </SelectContent>
