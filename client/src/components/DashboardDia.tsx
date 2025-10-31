@@ -258,7 +258,7 @@ export default function DashboardDia({
       if (grupo1.length > 0 || grupo2.length > 0) {
         const ws = workbook.addWorksheet("Rotação de Bombas");
 
-        ws.mergeCells("A1:V1");
+        ws.mergeCells("A1:Z1");
         ws.getCell("A1").value = titulo;
         ws.getCell("A1").style = estiloTitulo;
 
@@ -293,8 +293,8 @@ export default function DashboardDia({
           "RELEASE",
           "TAPE ON\nBAG",
           "FILME 1X1",
-          "",
-          "",
+          "PARÂMETRO\nDO PAINEL",
+          "ACRISSON",
           "",
           "SKU",
           "PESO SACOLA\nVARPE",
@@ -314,6 +314,8 @@ export default function DashboardDia({
         );
         grupo1Ordenado.forEach((coleta, idx) => {
           const row = ws.getRow(5 + idx);
+          // Para linhas L80-L83, incluir parametroPainel e acrisson
+          const temCamposEspeciais = ["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao);
           const values = [
             coleta.linhaProducao,
             coleta.velocidadeLinha,
@@ -334,8 +336,8 @@ export default function DashboardDia({
             coleta.release,
             coleta.tapeOnBag,
             coleta.filme1x1,
-            "", // 3 colunas vazias
-            "",
+            temCamposEspeciais ? coleta.parametroPainel : "",
+            temCamposEspeciais ? coleta.acrisson : "",
             "",
             coleta.sku,
             coleta.pesoSacolaVarpe,
@@ -380,8 +382,8 @@ export default function DashboardDia({
             "CORE\nWRAP",
             "CORE\nWRAP SIDE\nSEAL",
             "MAT FIX",
-            "",
-            "",
+            "PARÂMETRO\nDO PAINEL",
+            "ACRISSON",
             "",
             "SKU",
             "PESO SACOLA\nVARPE",
@@ -422,8 +424,8 @@ export default function DashboardDia({
               coleta.coreWrap,
               coleta.coreWrapSeal,
               coleta.matFix,
-              "", // 3 colunas vazias
-              "",
+              coleta.parametroPainel,
+              coleta.acrisson,
               "",
               coleta.sku,
               coleta.pesoSacolaVarpe,
@@ -443,7 +445,6 @@ export default function DashboardDia({
         }
 
         // Ajustar larguras das colunas de forma mais adequada ao conteúdo
-        // Grupo 2 tem mais colunas (até 26), então precisamos definir larguras para todas
         const columnWidths = [
           10, // Linha (A)
           14, // Velocidade da Linha (B)
@@ -464,13 +465,11 @@ export default function DashboardDia({
           12, // Release / Out Side Back Film Fix (Q)
           13, // Tape on Bag / Topsheet Fix (R)
           13, // Filme 1x1 / Core Wrap (S)
-          3, // Espaço vazio 1 / Core Wrap Side Seal (T)
-          3, // Espaço vazio 2 / Mat Fix (U)
-          3, // Espaço vazio 3 (V)
+          16, // Parâmetro do Painel / Core Wrap Side Seal (T)
+          13, // Acrisson / Mat Fix (U)
+          3, // Espaço vazio (V)
           15, // SKU (W)
           15, // Peso Sacola Varpe (X)
-          15, // SKU Grupo 2 (Y)
-          15, // Peso Sacola Varpe Grupo 2 (Z)
         ];
 
         columnWidths.forEach((width, idx) => {
