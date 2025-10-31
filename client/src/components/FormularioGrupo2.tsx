@@ -8,6 +8,7 @@ import {
 } from "@shared/schema";
 import { formatInTimeZone } from "date-fns-tz";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Form,
   FormControl,
@@ -62,7 +63,7 @@ export default function FormularioGrupo2({
 }: FormularioGrupo2Props) {
   const { toast } = useToast();
 
-  const { data: coletasExistentes } = useQuery<ColetaGrupo2[]>({
+  const { data: coletasExistentes, isLoading } = useQuery<ColetaGrupo2[]>({
     queryKey: ["/api/coleta/grupo2"],
   });
 
@@ -171,6 +172,24 @@ export default function FormularioGrupo2({
 
     mutation.mutate({ ...data, dataColeta, linhaProducao });
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          {CAMPOS_GRUPO2.map((campo) => (
+            <div key={campo.name} className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end">
+          <Skeleton className="h-10 w-32" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
