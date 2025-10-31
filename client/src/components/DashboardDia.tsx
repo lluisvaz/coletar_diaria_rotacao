@@ -439,7 +439,7 @@ export default function DashboardDia({
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `Coleta_Nordson_${dataFormatada}.xlsx`;
+      link.download = `Rotação_de_Bombas_${dataFormatada}.xlsx`;
       link.click();
       URL.revokeObjectURL(url);
 

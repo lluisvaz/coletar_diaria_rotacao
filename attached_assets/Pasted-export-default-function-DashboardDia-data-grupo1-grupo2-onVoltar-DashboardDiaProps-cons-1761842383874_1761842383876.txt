@@ -305,7 +305,7 @@ export default function DashboardDia({ data, grupo1, grupo2, onVoltar }: Dashboa
 
       // --- Gerar e Baixar o Arquivo ---
       const dataFormatada = format(parseISO(data), "dd-MM-yyyy", { locale: ptBR });
-      XLSX.writeFile(wb, `Coleta_Nordson_${dataFormatada}.xlsx`);
+      XLSX.writeFile(wb, `Rotação_de_Bombas_${dataFormatada}.xlsx`);
 
       toast({
         title: "Exportação concluída!",
