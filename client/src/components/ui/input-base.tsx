@@ -12,7 +12,7 @@ const InputBase = React.forwardRef<
     <Comp {...wrapperProps}>
       <div
         className={cn(
-          "flex h-9 w-full items-center gap-1 rounded-md border border-[#2E2F2F] bg-[#151515] px-3 py-2 text-base ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          "flex h-9 w-full items-center gap-1 rounded-md border border-[#E5E5E5] bg-[#151515] px-3 py-2 text-base ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
           className
         )}
         {...(asChild ? { ref, ...props } : {})}

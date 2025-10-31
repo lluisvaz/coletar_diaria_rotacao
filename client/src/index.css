@@ -18,19 +18,19 @@
 
   --foreground: 0 0% 0%;
 
-  --border: 210 4% 88%;
+  --border: 0 0% 90%;
 
   --card: 0 0% 100%;
 
   --card-foreground: 0 0% 0%;
 
-  --card-border: 210 4% 91%;
+  --card-border: 0 0% 90%;
 
   --sidebar: 0 0% 100%;
 
   --sidebar-foreground: 0 0% 0%;
 
-  --sidebar-border: 210 4% 86%;
+  --sidebar-border: 0 0% 90%;
 
   --sidebar-primary: 214 84% 42%;
 
@@ -46,7 +46,7 @@
 
   --popover-foreground: 0 0% 0%;
 
-  --popover-border: 210 5% 85%;
+  --popover-border: 0 0% 90%;
 
   --primary: 214 84% 42%;
 
@@ -243,17 +243,17 @@
 
   .component-container {
     background: transparent;
-    border: 1px solid #2E2F2F;
+    border: 1px solid #E5E5E5;
   }
 
   .custom-button {
     background: #151515;
-    border: 1px solid #2E2F2F;
+    border: 1px solid #E5E5E5;
   }
 
   input::placeholder,
   textarea::placeholder {
-    color: #2E2F2F !important;
+    color: #E5E5E5 !important;
   }
 }
 
