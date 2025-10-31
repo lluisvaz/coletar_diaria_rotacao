@@ -238,6 +238,16 @@ export default function DashboardDia({
         },
       };
 
+      const estiloCabecalhoAzul = {
+        ...estiloDados,
+        font: { bold: true, size: 10, color: { argb: "FFFFFFFF" } },
+        fill: {
+          type: "pattern" as const,
+          pattern: "solid" as const,
+          fgColor: { argb: "FF4472C4" }, // Azul
+        },
+      };
+
       const estiloTitulo = {
         font: { bold: true, size: 11 },
         alignment: {
@@ -303,7 +313,12 @@ export default function DashboardDia({
         headers.forEach((header, index) => {
           const cell = headerRow.getCell(index + 1);
           cell.value = header;
-          cell.style = estiloCabecalho;
+          // Aplicar estilo azul para SKU (19), Peso Sacola (20), Parâmetro do Painel (21) e Acrisson (22)
+          if (index === 19 || index === 20 || index === 21 || index === 22) {
+            cell.style = estiloCabecalhoAzul;
+          } else {
+            cell.style = estiloCabecalho;
+          }
         });
         headerRow.height = 45;
 
@@ -390,7 +405,12 @@ export default function DashboardDia({
           headersGrupo2.forEach((header, index) => {
             const cell = headerRowGrupo2.getCell(index + 1);
             cell.value = header;
-            cell.style = estiloCabecalho;
+            // Aplicar estilo azul para SKU (21), Peso Sacola (22), Parâmetro do Painel (23) e Acrisson (24)
+            if (index === 21 || index === 22 || index === 23 || index === 24) {
+              cell.style = estiloCabecalhoAzul;
+            } else {
+              cell.style = estiloCabecalho;
+            }
           });
           headerRowGrupo2.height = 45;
 
@@ -576,17 +596,29 @@ export default function DashboardDia({
                     </TableHead>
                     <TableHead
                       rowSpan={3}
-                      className="text-center border-r font-semibold"
+                      className="text-center border-r font-semibold text-blue-600 dark:text-blue-400"
                     >
                       SKU
                     </TableHead>
                     <TableHead
                       rowSpan={3}
-                      className="text-center border-r font-semibold"
+                      className="text-center border-r font-semibold text-blue-600 dark:text-blue-400"
                     >
                       Peso Sacola
                       <br />
                       Varpe
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold text-blue-600 dark:text-blue-400"
+                    >
+                      Parâmetro do Painel
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold text-blue-600 dark:text-blue-400"
+                    >
+                      Acrisson
                     </TableHead>
                     <TableHead
                       rowSpan={3}
@@ -688,18 +720,6 @@ export default function DashboardDia({
                     </TableHead>
                     <TableHead
                       rowSpan={3}
-                      className="text-center border-r font-semibold"
-                    >
-                      Parâmetro do Painel
-                    </TableHead>
-                    <TableHead
-                      rowSpan={3}
-                      className="text-center font-semibold"
-                    >
-                      Acrisson
-                    </TableHead>
-                    <TableHead
-                      rowSpan={3}
                       className="text-center font-semibold sticky right-0 bg-card"
                     >
                       Ações
@@ -732,6 +752,12 @@ export default function DashboardDia({
                         </TableCell>
                         <TableCell className="text-center font-mono border-r">
                           {coleta.pesoSacolaVarpe?.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-center font-mono border-r">
+                          {["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao) ? coleta.parametroPainel?.toFixed(2) : "-"}
+                        </TableCell>
+                        <TableCell className="text-center font-mono border-r">
+                          {["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao) ? coleta.acrisson?.toFixed(2) : "-"}
                         </TableCell>
                         <TableCell className="text-center font-mono border-r">
                           {coleta.velocidadeLinha?.toFixed(2)}
@@ -787,12 +813,6 @@ export default function DashboardDia({
                         <TableCell className="text-center font-mono border-r">
                           {coleta.filme1x1?.toFixed(2)}
                         </TableCell>
-                        <TableCell className="text-center font-mono border-r">
-                          {["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao) ? coleta.parametroPainel?.toFixed(2) : "-"}
-                        </TableCell>
-                        <TableCell className="text-center font-mono">
-                          {["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao) ? coleta.acrisson?.toFixed(2) : "-"}
-                        </TableCell>
                         <TableCell className="sticky right-0 bg-card">
                           <div className="flex gap-1 justify-center">
                             <Button
@@ -840,17 +860,29 @@ export default function DashboardDia({
                     </TableHead>
                     <TableHead
                       rowSpan={3}
-                      className="text-center border-r font-semibold"
+                      className="text-center border-r font-semibold text-blue-600 dark:text-blue-400"
                     >
                       SKU
                     </TableHead>
                     <TableHead
                       rowSpan={3}
-                      className="text-center border-r font-semibold"
+                      className="text-center border-r font-semibold text-blue-600 dark:text-blue-400"
                     >
                       Peso Sacola
                       <br />
                       Varpe
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold text-blue-600 dark:text-blue-400"
+                    >
+                      Parâmetro do Painel
+                    </TableHead>
+                    <TableHead
+                      rowSpan={3}
+                      className="text-center border-r font-semibold text-blue-600 dark:text-blue-400"
+                    >
+                      Acrisson
                     </TableHead>
                     <TableHead
                       rowSpan={3}
@@ -970,18 +1002,6 @@ export default function DashboardDia({
                     </TableHead>
                     <TableHead
                       rowSpan={3}
-                      className="text-center border-r font-semibold"
-                    >
-                      Parâmetro do Painel
-                    </TableHead>
-                    <TableHead
-                      rowSpan={3}
-                      className="text-center font-semibold"
-                    >
-                      Acrisson
-                    </TableHead>
-                    <TableHead
-                      rowSpan={3}
                       className="text-center font-semibold sticky right-0 bg-card"
                     >
                       Ações
@@ -1008,6 +1028,12 @@ export default function DashboardDia({
                         </TableCell>
                         <TableCell className="text-center font-mono border-r">
                           {coleta.pesoSacolaVarpe?.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-center font-mono border-r">
+                          {coleta.parametroPainel?.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-center font-mono border-r">
+                          {coleta.acrisson?.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-center font-mono border-r">
                           {coleta.velocidadeLinha?.toFixed(2)}
