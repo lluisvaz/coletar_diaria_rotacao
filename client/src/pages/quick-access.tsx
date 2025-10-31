@@ -6,7 +6,6 @@ const quickAccessCards = [
   {
     id: "rotacao-bombas",
     title: "Rotação de Bombas",
-    description: "Sistema de coleta diária de rotação das bombas",
     icon: Droplet,
     enabled: true,
     route: "/",
@@ -14,7 +13,6 @@ const quickAccessCards = [
   {
     id: "gramatura-semanal",
     title: "Gramatura Semanal",
-    description: "Controle semanal de gramatura",
     icon: Scale,
     enabled: false,
     route: "#",
@@ -22,7 +20,6 @@ const quickAccessCards = [
   {
     id: "controle-5s",
     title: "Controle 5S",
-    description: "Gestão do programa 5S",
     icon: CheckSquare,
     enabled: false,
     route: "#",
