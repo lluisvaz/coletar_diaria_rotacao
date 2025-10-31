@@ -254,10 +254,11 @@ export default function DashboardDia({
         },
       };
 
-      if (grupo1.length > 0) {
+      // Criar uma única aba com ambos os grupos
+      if (grupo1.length > 0 || grupo2.length > 0) {
         const ws = workbook.addWorksheet("ABS e Tape");
 
-        ws.mergeCells("A1:S1");
+        ws.mergeCells("A1:V1");
         ws.getCell("A1").value = titulo;
         ws.getCell("A1").style = estiloTitulo;
 
@@ -271,10 +272,9 @@ export default function DashboardDia({
         ws.mergeCells("D3:E3");
         ws.getCell("E3").value = mes;
 
+        // Headers para Grupo 1 - SKU e Peso Sacola vêm depois com 3 colunas de diferença
         const headers = [
           "",
-          "SKU",
-          "PESO SACOLA\nVARPE",
           "VELOCIDADE\nDA LINHA",
           "CORE ATTACH\n(ADESIVO\nCENTRAL)",
           "CORE WRAP\n(ADESIVO\nLATERAL)",
@@ -293,6 +293,11 @@ export default function DashboardDia({
           "RELEASE",
           "TAPE ON\nBAG",
           "FILME 1X1",
+          "",
+          "",
+          "",
+          "SKU",
+          "PESO SACOLA\nVARPE",
         ];
 
         const headerRow = ws.getRow(4);
@@ -303,6 +308,7 @@ export default function DashboardDia({
         });
         headerRow.height = 45;
 
+        // Adicionar dados do Grupo 1 (L90-L83)
         const grupo1Ordenado = [...grupo1].sort((a, b) =>
           a.linhaProducao.localeCompare(b.linhaProducao),
         );
@@ -310,8 +316,6 @@ export default function DashboardDia({
           const row = ws.getRow(5 + idx);
           const values = [
             coleta.linhaProducao,
-            coleta.sku,
-            coleta.pesoSacolaVarpe,
             coleta.velocidadeLinha,
             coleta.coreAttach,
             coleta.coreWrap,
@@ -330,116 +334,115 @@ export default function DashboardDia({
             coleta.release,
             coleta.tapeOnBag,
             coleta.filme1x1,
-          ];
-
-          values.forEach((value, colIdx) => {
-            const cell = row.getCell(colIdx + 1);
-            cell.value = value;
-            cell.style = estiloDados;
-          });
-        });
-
-        const columnWidths = [
-          8, 12, 12, 12, 14, 14, 10, 10, 10, 14, 14, 12, 12, 12, 10, 10, 10, 10,
-          10, 12, 12,
-        ];
-        columnWidths.forEach((width, idx) => {
-          ws.getColumn(idx + 1).width = width;
-        });
-      }
-
-      if (grupo2.length > 0) {
-        const ws = workbook.addWorksheet("Pants");
-
-        ws.mergeCells("A1:U1");
-        ws.getCell("A1").value = titulo;
-        ws.getCell("A1").style = estiloTitulo;
-
-        ws.getCell("B3").value = "DIA";
-        ws.getCell("B3").style = estiloDataLabel;
-        ws.mergeCells("B3:C3");
-        ws.getCell("C3").value = dia;
-
-        ws.getCell("D3").value = "MÊS";
-        ws.getCell("D3").style = estiloDataLabel;
-        ws.mergeCells("D3:E3");
-        ws.getCell("E3").value = mes;
-
-        const headers = [
-          "",
-          "SKU",
-          "PESO SACOLA\nVARPE",
-          "VELOCIDADE\nDA LINHA",
-          "WAIST\nPACKER",
-          "ISG\nELASTIC",
-          "WAIST\nELASTIC",
-          "ISG SIDE\nSEAL",
-          "ABSORVENT\nFIX",
-          "OUTER\nEDGE",
-          "INNER",
-          "BEAD",
-          "STANDING\nGATHER\nFRONT B. FIX",
-          "BACKFILM\nFIX",
-          "OSG SIDE\nSEAL",
-          "OSG\nELÁSTICO\n(LATERAL)",
-          "NW SEAL\nCONT\n(LATERAL)",
-          "NW SEAL\nINT CENT\n(RAL)",
-          "OUT SIDE\nBACK FILM\nFIX",
-          "TOPSHEET\nFIX",
-          "CORE\nWRAP",
-          "CORE\nWRAP SIDE\nSEAL",
-          "MAT FIX",
-        ];
-
-        const headerRow = ws.getRow(4);
-        headers.forEach((header, index) => {
-          const cell = headerRow.getCell(index + 1);
-          cell.value = header;
-          cell.style = estiloCabecalho;
-        });
-        headerRow.height = 45;
-
-        const grupo2Ordenado = [...grupo2].sort((a, b) =>
-          a.linhaProducao.localeCompare(b.linhaProducao),
-        );
-        grupo2Ordenado.forEach((coleta, idx) => {
-          const row = ws.getRow(5 + idx);
-          const values = [
-            coleta.linhaProducao,
+            "", // 3 colunas vazias
+            "",
+            "",
             coleta.sku,
             coleta.pesoSacolaVarpe,
-            coleta.velocidadeLinha,
-            coleta.waistPacker,
-            coleta.isgElastic,
-            coleta.waistElastic,
-            coleta.isgSideSeal,
-            coleta.absorventFix,
-            coleta.outerEdge,
-            coleta.inner,
-            coleta.bead,
-            coleta.standingGather,
-            coleta.backflimFix,
-            coleta.osgSideSeal,
-            coleta.osgElastico,
-            coleta.nwSealContLateral,
-            coleta.nwSealIntCentRal,
-            coleta.outSideBackFlm,
-            coleta.topsheetFix,
-            coleta.coreWrap,
-            coleta.coreWrapSeal,
-            coleta.matFix,
           ];
 
           values.forEach((value, colIdx) => {
             const cell = row.getCell(colIdx + 1);
             cell.value = value;
             cell.style = estiloDados;
+            // Formatar números com 2 casas decimais
+            if (typeof value === 'number' && colIdx !== 22) { // Não formatar SKU
+              cell.numFmt = '0.00';
+            }
           });
         });
 
+        // Adicionar dados do Grupo 2 (L84 e L85) 5 linhas abaixo do Grupo 1
+        if (grupo2.length > 0) {
+          const startRowGrupo2 = 5 + grupo1.length + 5;
+          
+          // Headers para Grupo 2
+          const headersGrupo2 = [
+            "",
+            "VELOCIDADE\nDA LINHA",
+            "WAIST\nPACKER",
+            "ISG\nELASTIC",
+            "WAIST\nELASTIC",
+            "ISG SIDE\nSEAL",
+            "ABSORVENT\nFIX",
+            "OUTER\nEDGE",
+            "INNER",
+            "BEAD",
+            "STANDING\nGATHER\nFRONT B. FIX",
+            "BACKFILM\nFIX",
+            "OSG SIDE\nSEAL",
+            "OSG\nELÁSTICO\n(LATERAL)",
+            "NW SEAL\nCONT\n(LATERAL)",
+            "NW SEAL\nINT CENT\n(RAL)",
+            "OUT SIDE\nBACK FILM\nFIX",
+            "TOPSHEET\nFIX",
+            "CORE\nWRAP",
+            "CORE\nWRAP SIDE\nSEAL",
+            "MAT FIX",
+            "",
+            "",
+            "",
+            "SKU",
+            "PESO SACOLA\nVARPE",
+          ];
+
+          const headerRowGrupo2 = ws.getRow(startRowGrupo2 - 1);
+          headersGrupo2.forEach((header, index) => {
+            const cell = headerRowGrupo2.getCell(index + 1);
+            cell.value = header;
+            cell.style = estiloCabecalho;
+          });
+          headerRowGrupo2.height = 45;
+
+          const grupo2Ordenado = [...grupo2].sort((a, b) =>
+            a.linhaProducao.localeCompare(b.linhaProducao),
+          );
+          grupo2Ordenado.forEach((coleta, idx) => {
+            const row = ws.getRow(startRowGrupo2 + idx);
+            const values = [
+              coleta.linhaProducao,
+              coleta.velocidadeLinha,
+              coleta.waistPacker,
+              coleta.isgElastic,
+              coleta.waistElastic,
+              coleta.isgSideSeal,
+              coleta.absorventFix,
+              coleta.outerEdge,
+              coleta.inner,
+              coleta.bead,
+              coleta.standingGather,
+              coleta.backflimFix,
+              coleta.osgSideSeal,
+              coleta.osgElastico,
+              coleta.nwSealContLateral,
+              coleta.nwSealIntCentRal,
+              coleta.outSideBackFlm,
+              coleta.topsheetFix,
+              coleta.coreWrap,
+              coleta.coreWrapSeal,
+              coleta.matFix,
+              "", // 3 colunas vazias
+              "",
+              "",
+              coleta.sku,
+              coleta.pesoSacolaVarpe,
+            ];
+
+            values.forEach((value, colIdx) => {
+              const cell = row.getCell(colIdx + 1);
+              cell.value = value;
+              cell.style = estiloDados;
+              // Formatar números com 2 casas decimais
+              if (typeof value === 'number' && colIdx !== 24) { // Não formatar SKU
+                cell.numFmt = '0.00';
+              }
+            });
+          });
+        }
+
         const columnWidths = [
-          8, 12, 12, 12, 12, 10, 12, 14, 12, 10, 10, 10, 14, 12, 12, 12, 12, 14,
-          14, 12, 10, 14, 10,
+          8, 12, 14, 14, 10, 10, 10, 14, 14, 12, 12, 12, 10, 10, 10, 10,
+          10, 12, 12, 4, 4, 4, 12, 12,
         ];
         columnWidths.forEach((width, idx) => {
           ws.getColumn(idx + 1).width = width;

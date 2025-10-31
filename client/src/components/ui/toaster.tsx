@@ -15,15 +15,15 @@ export function Toaster() {
   const getIcon = (variant?: string | null) => {
     switch (variant) {
       case "success":
-        return <CircleCheckIcon className="me-3 -mt-0.5 inline-flex text-emerald-500 shrink-0" size={16} aria-hidden="true" />
+        return <CircleCheckIcon className="shrink-0 text-emerald-500" size={18} aria-hidden="true" />
       case "destructive":
-        return <CircleXIcon className="me-3 -mt-0.5 inline-flex text-red-500 shrink-0" size={16} aria-hidden="true" />
+        return <CircleXIcon className="shrink-0 text-red-500" size={18} aria-hidden="true" />
       case "warning":
-        return <TriangleAlert className="me-3 -mt-0.5 inline-flex text-amber-500 shrink-0" size={16} aria-hidden="true" />
+        return <TriangleAlert className="shrink-0 text-amber-500" size={18} aria-hidden="true" />
       case "info":
-        return <InfoIcon className="me-3 -mt-0.5 inline-flex text-blue-500 shrink-0" size={16} aria-hidden="true" />
+        return <InfoIcon className="shrink-0 text-blue-500" size={18} aria-hidden="true" />
       default:
-        return <InfoIcon className="me-3 -mt-0.5 inline-flex text-blue-500 shrink-0" size={16} aria-hidden="true" />
+        return <InfoIcon className="shrink-0 text-blue-500" size={18} aria-hidden="true" />
     }
   }
 
@@ -32,15 +32,15 @@ export function Toaster() {
       {toasts.map(function ({ id, title, description, action, variant, ...props }) {
         return (
           <Toast key={id} variant={variant} {...props}>
-            <div className="flex gap-2 w-full">
-              <p className="grow text-sm flex items-start">
+            <div className="flex gap-3 w-full items-start">
+              <div className="flex items-start pt-0.5">
                 {getIcon(variant)}
-                <span className="flex flex-col gap-1">
-                  {title && <span className="font-semibold">{title}</span>}
-                  {description && <span className="opacity-90">{description}</span>}
-                </span>
-              </p>
-              {action}
+              </div>
+              <div className="flex-1 flex flex-col gap-1">
+                {title && <p className="text-sm font-semibold leading-tight">{title}</p>}
+                {description && <p className="text-sm opacity-90 leading-tight">{description}</p>}
+              </div>
+              {action && <div className="flex items-start">{action}</div>}
             </div>
             <ToastClose />
           </Toast>
