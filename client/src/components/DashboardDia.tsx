@@ -194,10 +194,10 @@ export default function DashboardDia({
   const handleDragMove = (e: MouseEvent | TouchEvent) => {
     if (!isDragging || !isMobile) return;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const deltaY = dragStartY - clientY;
+    const deltaY = clientY - dragStartY;
     const viewportHeight = window.innerHeight;
     const deltaPercent = (deltaY / viewportHeight) * 100;
-    const newHeight = Math.min(Math.max(dragStartHeight + deltaPercent, 30), 90);
+    const newHeight = Math.min(Math.max(dragStartHeight - deltaPercent, 30), 90);
     setModalHeight(newHeight);
   };
 
@@ -1059,25 +1059,27 @@ export default function DashboardDia({
         <DialogContent 
           className={
             isMobile
-              ? "fixed inset-x-0 bottom-0 max-w-none rounded-t-2xl border-t border-x-0 border-b-0 p-0 m-0 translate-x-0 translate-y-0 left-0 right-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom"
+              ? "fixed inset-x-0 bottom-0 w-full max-w-none rounded-t-2xl border-t border-x-0 border-b-0 p-0 m-0 translate-x-0 translate-y-0 left-0 right-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom"
               : "max-w-3xl max-h-[90vh] overflow-y-auto"
           }
-          style={isMobile ? { height: `${modalHeight}vh` } : undefined}
+          style={isMobile ? { height: `${modalHeight}vh`, width: '100vw' } : undefined}
         >
           {isMobile && (
             <div 
-              className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing"
+              className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing select-none"
               onMouseDown={handleDragStart}
               onTouchStart={handleDragStart}
             >
               <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
           )}
-          <div className={isMobile ? "px-6 pb-6 overflow-y-auto" : ""} style={isMobile ? { height: 'calc(100% - 80px)' } : undefined}>
-            <DialogHeader className={isMobile ? "pb-4" : ""}>
-              <DialogTitle>Editar Registro</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
+          <div className={isMobile ? "flex flex-col overflow-hidden" : ""} style={isMobile ? { height: 'calc(100% - 40px)' } : undefined}>
+            <div className={isMobile ? "px-4" : ""}>
+              <DialogHeader className={isMobile ? "pb-3" : ""}>
+                <DialogTitle>Editar Registro</DialogTitle>
+              </DialogHeader>
+            </div>
+            <div className={isMobile ? "px-4 overflow-y-auto flex-1" : "grid gap-4 py-4"}>
             {editandoGrupo === 1 ? (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -1466,15 +1468,17 @@ export default function DashboardDia({
               </div>
             )}
             </div>
+            <div className={isMobile ? "px-4 pt-4 pb-4 border-t bg-background" : ""}>
+              <DialogFooter>
+                <Button variant="outline" onClick={cancelarEdicao} data-testid="button-cancel-edit">
+                  Cancelar
+                </Button>
+                <Button onClick={salvarEdicao} disabled={updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending} data-testid="button-save-edit">
+                  {updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending ? "Salvando..." : "Salvar"}
+                </Button>
+              </DialogFooter>
+            </div>
           </div>
-          <DialogFooter className={isMobile ? "px-6 pb-4" : ""}>
-            <Button variant="outline" onClick={cancelarEdicao} data-testid="button-cancel-edit">
-              Cancelar
-            </Button>
-            <Button onClick={salvarEdicao} disabled={updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending} data-testid="button-save-edit">
-              {updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending ? "Salvando..." : "Salvar"}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </Card>
