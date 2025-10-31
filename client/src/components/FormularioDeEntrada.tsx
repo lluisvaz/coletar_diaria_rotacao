@@ -61,7 +61,7 @@ export default function FormularioDeEntrada() {
   });
 
   const dataColetaFormatada = format(dataColeta, "yyyy-MM-dd");
-  
+
   const linhasRegistradas = new Set<string>();
   grupo1Data?.forEach((coleta) => {
     if (coleta.dataColeta === dataColetaFormatada) {
@@ -117,7 +117,7 @@ export default function FormularioDeEntrada() {
                     disabled={linhasRegistradas.has(linha)}
                     data-testid={`option-linha-${linha}`}
                   >
-                    {linha} {linhasRegistradas.has(linha) && "(já registrado)"}
+                    {linha} {linhasRegistradas.has(linha)}
                   </SelectItem>
                 ))}
               </SelectContent>
