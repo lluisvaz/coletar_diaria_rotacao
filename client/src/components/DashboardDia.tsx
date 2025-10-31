@@ -440,12 +440,54 @@ export default function DashboardDia({
           });
         }
 
+        // Ajustar larguras das colunas de forma mais adequada ao conteúdo
+        // Grupo 2 tem mais colunas (até 26), então precisamos definir larguras para todas
         const columnWidths = [
-          8, 12, 14, 14, 10, 10, 10, 14, 14, 12, 12, 12, 10, 10, 10, 10,
-          10, 12, 12, 4, 4, 4, 12, 12,
+          10,  // Linha (A)
+          14,  // Velocidade da Linha (B)
+          16,  // Core Attach / Waist Packer (C)
+          16,  // Core Wrap / ISG Elastic (D)
+          12,  // Surge / Waist Elastic (E)
+          12,  // Cuff End / ISG Side Seal (F)
+          12,  // Bead / Absorvent Fix (G)
+          16,  // Leg Elastic / Outer Edge (H)
+          16,  // Cuff Elastic / Inner (I)
+          13,  // Temporary / Bead (J)
+          14,  // Topsheet / Standing Gather (K)
+          14,  // Backsheet / Backfilm Fix (L)
+          12,  // Frontal / OSG Side Seal (M)
+          13,  // Ear Attach / OSG Elastico (N)
+          12,  // Pulp Fix / NW Seal Cont (O)
+          12,  // Central / NW Seal Int Cent (P)
+          12,  // Release / Out Side Back Film Fix (Q)
+          13,  // Tape on Bag / Topsheet Fix (R)
+          13,  // Filme 1x1 / Core Wrap (S)
+          3,   // Espaço vazio 1 / Core Wrap Side Seal (T)
+          3,   // Espaço vazio 2 / Mat Fix (U)
+          3,   // Espaço vazio 3 (V)
+          15,  // SKU (W)
+          15,  // Peso Sacola Varpe (X)
+          15,  // SKU Grupo 2 (Y)
+          15,  // Peso Sacola Varpe Grupo 2 (Z)
         ];
+        
         columnWidths.forEach((width, idx) => {
           ws.getColumn(idx + 1).width = width;
+        });
+
+        // Habilitar ajuste automático de altura para todas as linhas
+        ws.eachRow((row, rowNumber) => {
+          if (rowNumber >= 4) { // Apenas para linhas de dados e cabeçalho
+            row.eachCell((cell) => {
+              // Garantir que wrapText esteja habilitado (já está no estilo, mas reforçando)
+              if (cell.style.alignment) {
+                cell.alignment = {
+                  ...cell.style.alignment,
+                  wrapText: true,
+                };
+              }
+            });
+          }
         });
       }
 
