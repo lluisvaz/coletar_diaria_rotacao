@@ -105,29 +105,29 @@ export default function ModalEdicaoColeta({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="sku" className="text-blue-600 dark:text-blue-400">SKU</Label>
-              <Input id="sku" name="sku" defaultValue={coleta.sku} required />
+              <Input id="sku" name="sku" defaultValue={coleta.sku} required data-testid="input-sku" />
             </div>
             {isGrupo1 && coletaG1 && (
               <>
                 <div className="space-y-2">
                   <Label className="text-blue-600 dark:text-blue-400">Peso Sacola Varpe</Label>
-                  <Input type="number" name="pesoSacolaVarpe" defaultValue={coletaG1.pesoSacolaVarpe} required />
+                  <Input type="number" name="pesoSacolaVarpe" defaultValue={coletaG1.pesoSacolaVarpe} required data-testid="input-pesoSacolaVarpe" />
                 </div>
                 {["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao) && (
                   <>
                     <div className="space-y-2">
                       <Label className="text-blue-600 dark:text-blue-400">Parâmetro do Painel</Label>
-                      <Input type="number" name="parametroPainel" defaultValue={coletaG1.parametroPainel ?? 0} required />
+                      <Input type="number" name="parametroPainel" defaultValue={coletaG1.parametroPainel ?? 0} required data-testid="input-parametroPainel" />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-blue-600 dark:text-blue-400">Acrisson</Label>
-                      <Input type="number" name="acrisson" defaultValue={coletaG1.acrisson ?? 0} required />
+                      <Input type="number" name="acrisson" defaultValue={coletaG1.acrisson ?? 0} required data-testid="input-acrisson" />
                     </div>
                   </>
                 )}
                 <div className="space-y-2">
                   <Label>Velocidade Linha</Label>
-                  <Input type="number" name="velocidadeLinha" defaultValue={coletaG1.velocidadeLinha} required />
+                  <Input type="number" name="velocidadeLinha" defaultValue={coletaG1.velocidadeLinha} required data-testid="input-velocidadeLinha" />
                 </div>
                 <div className="space-y-2">
                   <Label>Core Attach</Label>
@@ -203,19 +203,19 @@ export default function ModalEdicaoColeta({
               <>
                 <div className="space-y-2">
                   <Label className="text-blue-600 dark:text-blue-400">Peso Sacola Varpe</Label>
-                  <Input type="number" name="pesoSacolaVarpe" defaultValue={coletaG2.pesoSacolaVarpe} required />
+                  <Input type="number" name="pesoSacolaVarpe" defaultValue={coletaG2.pesoSacolaVarpe} required data-testid="input-pesoSacolaVarpe" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-blue-600 dark:text-blue-400">Parâmetro do Painel</Label>
-                  <Input type="number" name="parametroPainel" defaultValue={coletaG2.parametroPainel ?? 0} required />
+                  <Input type="number" name="parametroPainel" defaultValue={coletaG2.parametroPainel ?? 0} required data-testid="input-parametroPainel" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-blue-600 dark:text-blue-400">Acrisson</Label>
-                  <Input type="number" name="acrisson" defaultValue={coletaG2.acrisson ?? 0} required />
+                  <Input type="number" name="acrisson" defaultValue={coletaG2.acrisson ?? 0} required data-testid="input-acrisson" />
                 </div>
                 <div className="space-y-2">
                   <Label>Velocidade Linha</Label>
-                  <Input type="number" name="velocidadeLinha" defaultValue={coletaG2.velocidadeLinha} required />
+                  <Input type="number" name="velocidadeLinha" defaultValue={coletaG2.velocidadeLinha} required data-testid="input-velocidadeLinha" />
                 </div>
                 <div className="space-y-2">
                   <Label>Waist Packer</Label>
