@@ -21,6 +21,14 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+} from "@/components/ui/drawer";
+import { FormularioEdicaoGrupo } from "./DashboardDia/FormularioEdicaoGrupo";
 import { type ColetaGrupo1, type ColetaGrupo2 } from "@shared/schema";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -62,10 +70,6 @@ export default function DashboardDia({
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [editandoGrupo, setEditandoGrupo] = useState<1 | 2 | null>(null);
   const [valoresEditados, setValoresEditados] = useState<any>({});
-  const [modalHeight, setModalHeight] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartY, setDragStartY] = useState(0);
-  const [dragStartHeight, setDragStartHeight] = useState(0);
 
   const updateGrupo1Mutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<ColetaGrupo1> }) =>
@@ -182,44 +186,6 @@ export default function DashboardDia({
   const atualizarCampo = (campo: string, valor: any) => {
     setValoresEditados((prev: any) => ({ ...prev, [campo]: valor }));
   };
-
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isMobile) return;
-    setIsDragging(true);
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    setDragStartY(clientY);
-    setDragStartHeight(modalHeight);
-  };
-
-  const handleDragMove = (e: MouseEvent | TouchEvent) => {
-    if (!isDragging || !isMobile) return;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const deltaY = clientY - dragStartY;
-    const viewportHeight = window.innerHeight;
-    const deltaPercent = (deltaY / viewportHeight) * 100;
-    const newHeight = Math.min(Math.max(dragStartHeight - deltaPercent, 30), 90);
-    setModalHeight(newHeight);
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isMobile && isDragging) {
-      window.addEventListener('mousemove', handleDragMove);
-      window.addEventListener('mouseup', handleDragEnd);
-      window.addEventListener('touchmove', handleDragMove);
-      window.addEventListener('touchend', handleDragEnd);
-      
-      return () => {
-        window.removeEventListener('mousemove', handleDragMove);
-        window.removeEventListener('mouseup', handleDragEnd);
-        window.removeEventListener('touchmove', handleDragMove);
-        window.removeEventListener('touchend', handleDragEnd);
-      };
-    }
-  }, [isDragging, isMobile]);
 
   const exportarParaExcel = async () => {
     try {
@@ -1055,432 +1021,62 @@ export default function DashboardDia({
 
       {ConfirmerDialog}
 
-      <Dialog open={modalEdicaoAberto} onOpenChange={setModalEdicaoAberto}>
-        <DialogContent 
-          className={
-            isMobile
-              ? "fixed inset-x-0 bottom-0 w-full max-w-none rounded-t-2xl border-t border-x-0 border-b-0 p-0 m-0 translate-x-0 translate-y-0 left-0 right-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom"
-              : "max-w-3xl max-h-[90vh] overflow-y-auto"
-          }
-          style={isMobile ? { height: `${modalHeight}vh`, width: '100vw' } : undefined}
-        >
-          {isMobile && (
-            <div 
-              className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing select-none"
-              onMouseDown={handleDragStart}
-              onTouchStart={handleDragStart}
-            >
-              <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
-            </div>
-          )}
-          <div className={isMobile ? "flex flex-col overflow-hidden" : ""} style={isMobile ? { height: 'calc(100% - 40px)' } : undefined}>
-            <div className={isMobile ? "px-4" : ""}>
-              <DialogHeader className={isMobile ? "pb-3" : ""}>
-                <DialogTitle>Editar Registro</DialogTitle>
-              </DialogHeader>
-            </div>
-            <div className={isMobile ? "px-4 overflow-y-auto flex-1" : "grid gap-4 py-4"}>
-            {editandoGrupo === 1 ? (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">SKU</label>
-                  <Input
-                    type="text"
-                    value={valoresEditados.sku || ""}
-                    onChange={(e) => atualizarCampo("sku", e.target.value)}
-                    data-testid="input-edit-sku"
+
+      {isMobile ? (
+        <Drawer open={modalEdicaoAberto} onOpenChange={setModalEdicaoAberto}>
+          <DrawerContent className="max-h-[85vh]">
+            <div className="flex flex-col h-full overflow-hidden">
+              <DrawerHeader className="px-4">
+                <DrawerTitle>Editar Registro</DrawerTitle>
+              </DrawerHeader>
+              <div className="px-4 overflow-y-auto flex-1">
+                {editandoGrupo && (
+                  <FormularioEdicaoGrupo
+                    grupo={editandoGrupo}
+                    valoresEditados={valoresEditados}
+                    atualizarCampo={atualizarCampo}
                   />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Peso Sacola Varpe</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.pesoSacolaVarpe || 0}
-                    onChange={(e) => atualizarCampo("pesoSacolaVarpe", parseFloat(e.target.value) || 0)}
-                    data-testid="input-edit-pesoSacolaVarpe"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Velocidade da Linha</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.velocidadeLinha || 0}
-                    onChange={(e) => atualizarCampo("velocidadeLinha", parseFloat(e.target.value) || 0)}
-                    data-testid="input-edit-velocidadeLinha"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Core Attach</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.coreAttach || 0}
-                    onChange={(e) => atualizarCampo("coreAttach", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Core Wrap</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.coreWrap || 0}
-                    onChange={(e) => atualizarCampo("coreWrap", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Surge</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.surge || 0}
-                    onChange={(e) => atualizarCampo("surge", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Cuff End</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.cuffEnd || 0}
-                    onChange={(e) => atualizarCampo("cuffEnd", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Bead</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.bead || 0}
-                    onChange={(e) => atualizarCampo("bead", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Leg Elastic</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.legElastic || 0}
-                    onChange={(e) => atualizarCampo("legElastic", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Cuff Elastic</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.cuffElastic || 0}
-                    onChange={(e) => atualizarCampo("cuffElastic", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Temporary</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.temporary || 0}
-                    onChange={(e) => atualizarCampo("temporary", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Topsheet</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.topsheet || 0}
-                    onChange={(e) => atualizarCampo("topsheet", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Backsheet</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.backsheet || 0}
-                    onChange={(e) => atualizarCampo("backsheet", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Frontal</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.frontal || 0}
-                    onChange={(e) => atualizarCampo("frontal", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Ear Attach</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.earAttach || 0}
-                    onChange={(e) => atualizarCampo("earAttach", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Pulp Fix</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.pulpFix || 0}
-                    onChange={(e) => atualizarCampo("pulpFix", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Central</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.central || 0}
-                    onChange={(e) => atualizarCampo("central", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Release</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.release || 0}
-                    onChange={(e) => atualizarCampo("release", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Tape on Bag</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.tapeOnBag || 0}
-                    onChange={(e) => atualizarCampo("tapeOnBag", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Filme 1x1</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.filme1x1 || 0}
-                    onChange={(e) => atualizarCampo("filme1x1", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
+                )}
               </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">SKU</label>
-                  <Input
-                    type="text"
-                    value={valoresEditados.sku || ""}
-                    onChange={(e) => atualizarCampo("sku", e.target.value)}
-                    data-testid="input-edit-sku"
-                  />
+              <DrawerFooter className="px-4 pt-4 pb-4 border-t">
+                <div className="flex gap-2 w-full">
+                  <Button variant="outline" onClick={cancelarEdicao} data-testid="button-cancel-edit" className="flex-1">
+                    Cancelar
+                  </Button>
+                  <Button onClick={salvarEdicao} disabled={updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending} data-testid="button-save-edit" className="flex-1">
+                    {updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending ? "Salvando..." : "Salvar"}
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Peso Sacola Varpe</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.pesoSacolaVarpe || 0}
-                    onChange={(e) => atualizarCampo("pesoSacolaVarpe", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Velocidade da Linha</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.velocidadeLinha || 0}
-                    onChange={(e) => atualizarCampo("velocidadeLinha", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Waist Packer</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.waistPacker || 0}
-                    onChange={(e) => atualizarCampo("waistPacker", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">ISG Elastic</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.isgElastic || 0}
-                    onChange={(e) => atualizarCampo("isgElastic", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Waist Elastic</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.waistElastic || 0}
-                    onChange={(e) => atualizarCampo("waistElastic", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">ISG Side Seal</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.isgSideSeal || 0}
-                    onChange={(e) => atualizarCampo("isgSideSeal", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Absorvent Fix</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.absorventFix || 0}
-                    onChange={(e) => atualizarCampo("absorventFix", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Outer Edge</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.outerEdge || 0}
-                    onChange={(e) => atualizarCampo("outerEdge", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Inner</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.inner || 0}
-                    onChange={(e) => atualizarCampo("inner", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Bead</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.bead || 0}
-                    onChange={(e) => atualizarCampo("bead", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Standing Gather</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.standingGather || 0}
-                    onChange={(e) => atualizarCampo("standingGather", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Backfilm Fix</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.backflimFix || 0}
-                    onChange={(e) => atualizarCampo("backflimFix", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">OSG Side Seal</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.osgSideSeal || 0}
-                    onChange={(e) => atualizarCampo("osgSideSeal", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">OSG Elástico</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.osgElastico || 0}
-                    onChange={(e) => atualizarCampo("osgElastico", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">NW Seal Cont Lateral</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.nwSealContLateral || 0}
-                    onChange={(e) => atualizarCampo("nwSealContLateral", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">NW Seal Int Cent Ral</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.nwSealIntCentRal || 0}
-                    onChange={(e) => atualizarCampo("nwSealIntCentRal", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Out Side Back Film</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.outSideBackFlm || 0}
-                    onChange={(e) => atualizarCampo("outSideBackFlm", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Topsheet Fix</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.topsheetFix || 0}
-                    onChange={(e) => atualizarCampo("topsheetFix", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Core Wrap</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.coreWrap || 0}
-                    onChange={(e) => atualizarCampo("coreWrap", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Core Wrap Seal</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.coreWrapSeal || 0}
-                    onChange={(e) => atualizarCampo("coreWrapSeal", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Mat Fix</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valoresEditados.matFix || 0}
-                    onChange={(e) => atualizarCampo("matFix", parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-              </div>
-            )}
+              </DrawerFooter>
             </div>
-            <div className={isMobile ? "px-4 pt-4 pb-4 border-t bg-background" : ""}>
-              <DialogFooter>
-                <Button variant="outline" onClick={cancelarEdicao} data-testid="button-cancel-edit">
-                  Cancelar
-                </Button>
-                <Button onClick={salvarEdicao} disabled={updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending} data-testid="button-save-edit">
-                  {updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending ? "Salvando..." : "Salvar"}
-                </Button>
-              </DialogFooter>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={modalEdicaoAberto} onOpenChange={setModalEdicaoAberto}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Editar Registro</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              {editandoGrupo && (
+                <FormularioEdicaoGrupo
+                  grupo={editandoGrupo}
+                  valoresEditados={valoresEditados}
+                  atualizarCampo={atualizarCampo}
+                />
+              )}
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter>
+              <Button variant="outline" onClick={cancelarEdicao} data-testid="button-cancel-edit">
+                Cancelar
+              </Button>
+              <Button onClick={salvarEdicao} disabled={updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending} data-testid="button-save-edit">
+                {updateGrupo1Mutation.isPending || updateGrupo2Mutation.isPending ? "Salvando..." : "Salvar"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </Card>
   );
 }
