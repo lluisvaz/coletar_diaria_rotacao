@@ -113,18 +113,14 @@ export default function ModalEdicaoColeta({
                   <Label className="text-blue-600 dark:text-blue-400">Peso Sacola Varpe</Label>
                   <Input type="number" name="pesoSacolaVarpe" defaultValue={coletaG1.pesoSacolaVarpe} required data-testid="input-pesoSacolaVarpe" />
                 </div>
-                {["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao) && (
-                  <>
-                    <div className="space-y-2">
-                      <Label className="text-blue-600 dark:text-blue-400">Parâmetro do Painel</Label>
-                      <Input type="number" name="parametroPainel" defaultValue={coletaG1.parametroPainel ?? 0} required data-testid="input-parametroPainel" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-blue-600 dark:text-blue-400">Acrisson</Label>
-                      <Input type="number" name="acrisson" defaultValue={coletaG1.acrisson ?? 0} required data-testid="input-acrisson" />
-                    </div>
-                  </>
-                )}
+                <div className="space-y-2">
+                  <Label className="text-blue-600 dark:text-blue-400">Parâmetro do Painel</Label>
+                  <Input type="number" name="parametroPainel" defaultValue={coletaG1.parametroPainel ?? 0} required={["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao)} data-testid="input-parametroPainel" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-blue-600 dark:text-blue-400">Acrisson</Label>
+                  <Input type="number" name="acrisson" defaultValue={coletaG1.acrisson ?? 0} required={["L80", "L81", "L82", "L83"].includes(coleta.linhaProducao)} data-testid="input-acrisson" />
+                </div>
                 <div className="space-y-2">
                   <Label>Velocidade Linha</Label>
                   <Input type="number" name="velocidadeLinha" defaultValue={coletaG1.velocidadeLinha} required data-testid="input-velocidadeLinha" />
